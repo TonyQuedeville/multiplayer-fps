@@ -8,20 +8,35 @@
 
 # -----------------------------------------------------------------------------------------------
 #  imports:
-import OpenGL.GL as gl
-import OpenGL.GLUT as glut
-import OpenGL.GLU as glu
+import random
+import pygame
+from pygame.locals import *
+from OpenGL.GL import *
+from OpenGL.GLU import *
+# from OpenGL.GLUT import *
+
 
 # -----------------------------------------------------------------------------------------------
 # globals:
 
 # -----------------------------------------------------------------------------------------------
 
-def sphere(position = [0.0, 0.0, 0.0], rayon = 1, divH = 50, divV = 50, rotate = [0,0,1,0], color=[0.0, 0.0, 1.0]):
-    # Sphère
-    gl.glPushMatrix()
-    gl.glTranslatef(*position)
-    gl.glRotatef(*rotate)
-    gl.glColor3f(*color)
-    glut.glutSolidSphere([rayon, divH, divV]) # Rayon, nb de division horizontale, nb de divisions verticales
-    gl.glPopMatrix()
+def sphere(position=(0, 0, 0), radius=0.25, tremblote=0, slices=30, stacks=30, lines=False):        
+    sphere_surface = gluNewQuadric()
+    gluQuadricTexture(sphere_surface, GL_TRUE)
+
+    glPushMatrix()
+    glTranslatef(position[0]+0.5, position[1]+0.5, position[2]-0.5)
+    
+    glRotatef(50+random.randint(-tremblote, tremblote), 1, 0, 0)
+    glRotatef(5+random.randint(-tremblote, tremblote), 0, 1, 0)
+    glRotatef(-30+random.randint(-tremblote, tremblote), 0, 0, 1)
+
+    if lines:
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+
+    gluSphere(sphere_surface, radius, slices, stacks)
+
+    glPopMatrix()
+
+
