@@ -14,7 +14,7 @@ import numpy as np
 
 class Camera():
     def __init__(self, position=[1, 0, 1], lookAt=[0, 0, -1], up=[0, 1, 0], speed=0.1):
-        self.position = (position[0]+.5, position[1], position[2]-.5) 
+        self.position = (position[0]+.5, position[1]+.5, position[2]-.5) 
         self.move = [0, 0, 0]   # Progression de déplacement
         self.lookAt = lookAt    # Point de regard de la camera en degré
         self.rotate = [0, 0, 0] # Progression du point de regard. (rotation)

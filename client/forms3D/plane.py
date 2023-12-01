@@ -9,6 +9,15 @@
 # -----------------------------------------------------------------------------------------------
 #  imports:
 from OpenGL.GL import *
+from forms3D.cube import cube
+
+def porte(position=(0,0,0), size=(.99, 0.01, .99), chiffre_rotate=0):
+    cube((position[0], position[1]-.5, position[2]), size, chiffre_rotate),
+    cube((position[0], position[1]+.5, position[2]), size, chiffre_rotate+180),
+
+def couloir(position=(0,0,0), size=(.99, 0.01, .99)):
+    plane(position, size)
+    plane((position[0], position[1] + 1, position[2]), size)
 
 def plane(position=(0,0,0), size=(.99, 0.01, .99), lines=False):
     x= position[0]
@@ -30,7 +39,7 @@ def plane(position=(0,0,0), size=(.99, 0.01, .99), lines=False):
     (5,7)
     )
     
-    verticies = (
+    sols_vertices = (
         (x, y, z),                          # 0
         (x+size[0], y, z),                  # 1
         (x+size[0], y+size[1], z),          # 2
@@ -46,69 +55,69 @@ def plane(position=(0,0,0), size=(.99, 0.01, .99), lines=False):
         for edge in edges:
             glColor3fv((1, 1, 1))
             for vertex in edge:
-                glVertex3fv(verticies[vertex])
+                glVertex3fv(sols_vertices[vertex])
         glEnd()
     else:
         glBegin(GL_QUADS)
         
         # Face Avant
         glTexCoord2f(0.0, 0.0)
-        glVertex3fv(verticies[0])
+        glVertex3fv(sols_vertices[0])
         glTexCoord2f(1.0, 0.0)
-        glVertex3fv(verticies[1])
+        glVertex3fv(sols_vertices[1])
         glTexCoord2f(1.0, 1.0)
-        glVertex3fv(verticies[2])
+        glVertex3fv(sols_vertices[2])
         glTexCoord2f(0.0, 1.0)
-        glVertex3fv(verticies[3])
+        glVertex3fv(sols_vertices[3])
         
         # # Face Arrière
         glTexCoord2f(1.0, 0.0)
-        glVertex3fv(verticies[4])
+        glVertex3fv(sols_vertices[4])
         glTexCoord2f(1.0, 1.0)
-        glVertex3fv(verticies[5])
+        glVertex3fv(sols_vertices[5])
         glTexCoord2f(0.0, 1.0)
-        glVertex3fv(verticies[6])
+        glVertex3fv(sols_vertices[6])
         glTexCoord2f(0.0, 0.0)
-        glVertex3fv(verticies[7])
+        glVertex3fv(sols_vertices[7])
         
         # Face Dessus
         glTexCoord2f(0.0, 1.0)      
-        glVertex3fv(verticies[5])
+        glVertex3fv(sols_vertices[5])
         glTexCoord2f(0.0, 0.0)
-        glVertex3fv(verticies[3])       
+        glVertex3fv(sols_vertices[3])    
         glTexCoord2f(1.0, 0.0)
-        glVertex3fv(verticies[2])        
+        glVertex3fv(sols_vertices[2]) 
         glTexCoord2f(1.0, 1.0)
-        glVertex3fv(verticies[6])
+        glVertex3fv(sols_vertices[6])
         
         # Face Dessous
         glTexCoord2f(1.0, 1.0)
-        glVertex3fv(verticies[4])
+        glVertex3fv(sols_vertices[4])
         glTexCoord2f(0.0, 1.0)
-        glVertex3fv(verticies[7])
+        glVertex3fv(sols_vertices[7])
         glTexCoord2f(0.0, 0.0)
-        glVertex3fv(verticies[1])
+        glVertex3fv(sols_vertices[1])
         glTexCoord2f(1.0, 0.0)
-        glVertex3fv(verticies[0])
+        glVertex3fv(sols_vertices[0])
         
         # # Face Droite 
         glTexCoord2f(1.0, 0.0)
-        glVertex3fv(verticies[7])
+        glVertex3fv(sols_vertices[7])
         glTexCoord2f(1.0, 1.0)
-        glVertex3fv(verticies[6])
+        glVertex3fv(sols_vertices[6])
         glTexCoord2f(0.0, 1.0)
-        glVertex3fv(verticies[2])
+        glVertex3fv(sols_vertices[2])
         glTexCoord2f(0.0, 0.0)
-        glVertex3fv(verticies[1])
+        glVertex3fv(sols_vertices[1])
         
         # # Face Gauche
         glTexCoord2f(0.0, 0.0)
-        glVertex3fv(verticies[4])       
+        glVertex3fv(sols_vertices[4])   
         glTexCoord2f(1.0, 0.0)
-        glVertex3fv(verticies[0])       
+        glVertex3fv(sols_vertices[0])  
         glTexCoord2f(1.0, 1.0)
-        glVertex3fv(verticies[3])      
+        glVertex3fv(sols_vertices[3])
         glTexCoord2f(0.0, 1.0)
-        glVertex3fv(verticies[5])
+        glVertex3fv(sols_vertices[5])
         
         glEnd()

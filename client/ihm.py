@@ -19,15 +19,12 @@ from OpenGL.GLU import gluPerspective, gluLookAt
 # import pyBullet # simulation physique
 
 from forms3D.scene import Scene
-from forms3D.camera import Camera
-from forms3D.textures import Texture
-from forms3D.textures import Texture
 
 # -----------------------------------------------------------------------------------------------
 # Pygame : interface 2D
 
 # Changement de projection des oeuvres à intervals régulier
-def image_random(scene, timer=5):
+def image_random(scene, timer=0):
     if timer > 0:
         while True:
             scene.random_theme()
@@ -45,36 +42,32 @@ def objet_rotate(scene, timer=.1):
             time.sleep(timer)
 
 def initIHM():
-    room = 1
-    texture = Texture(room, 1)
-    scene = Scene(room, texture)
-    camera = Camera(position=scene.player_position)
+    # Fenêtre pygame
+    pygame.init()
+    largeur, hauteur = 1200, 600
+    flags = DOUBLEBUF|OPENGL  # Mode 1200x600
+    # flags = pygame.FULLSCREEN | pygame.DOUBLEBUF | OPENGL | pygame.HWSURFACE # Mode plein écran
+    # Créez la fenêtre Pygame
+    fenetre_pygame = pygame.display.set_mode((largeur, hauteur), flags)
+    
+    # Initialisation Room 0
+    scene = Scene(1)
 
-    last_time = time.time() # Timer pour l'appuis constant sur avance
     avance = 0 # Valeur d'avance (recul si < 0)
 
     rotate_player = False
-    i_rot = 0       # Iterateur de rotation
-    angle = 0       # Angle de rotation
+    i_rot = 0  # Iterateur de rotation
+    angle = 0  # Angle de rotation
     
-    pygame.init()
-    largeur, hauteur = 1200, 600
-    fenetre_pygame = pygame.display.set_mode((largeur, hauteur), DOUBLEBUF|OPENGL)  # Créez la fenêtre Pygame
-    clock = pygame.time.Clock()  # Utilisez une horloge pour contrôler la vitesse de rafraîchissement
-    
-    # Dessinez la fenêtre Pygame
-    fenetre_pygame.fill((255, 255, 255))  # couleur de fond pygame
-    
+    # Timers de synchronisation
+    clock = pygame.time.Clock() # Timer pour la vitesse de rafraîchissement
+    last_time = time.time() # Timer pour l'appuis constant sur avance
+
+    # Fenêtre pyOpenGL
     gluPerspective(60, (largeur/hauteur), 0.1, 50.0)
     glEnable(GL_DEPTH_TEST)
     glEnable(GL_NORMALIZE)
     glEnable(GL_COLOR_MATERIAL)
-    
-    # Chargement des textures
-    texture.load_sols()
-    texture.load_eyes()
-    texture.load_theme()
-    texture.load_chiffre()
     
     # Changement de projection des oeuvres à intervals régulier
     theme_thread = threading.Thread(target=image_random, args=(scene,))
@@ -105,16 +98,16 @@ def initIHM():
                     # Gauche
                     if i_rot == 0:
                         angle = -90
-                        camera.rotate_camera(angle)
-                        i_rot += camera.rotate_speed
+                        scene.camera.rotate_camera(angle)
+                        i_rot += scene.camera.rotate_speed
                         rotate_player = True
                 
                 elif event.key == pygame.K_RIGHT:
                     # Droite
                     if i_rot == 0:
                         angle = 90
-                        camera.rotate_camera(angle)
-                        i_rot += camera.rotate_speed
+                        scene.camera.rotate_camera(angle)
+                        i_rot += scene.camera.rotate_speed
                         rotate_player = True
 
                 elif event.key == pygame.K_UP:
@@ -137,18 +130,19 @@ def initIHM():
                 glRotatef(angle/12, 0, 1, 0)
                 i_rot -=1            
             else:
-                scene.set_room(room)
-                scene.set_player_position((camera.position[0], 0, camera.position[2]))
-                scene.set_texture(texture)
+                scene.set_player_position()
                 rotate_player = False
             
         if avance != 0:
-            camera.move_camera(avance)
-            scene.set_room(room)
-            scene.set_player_position((camera.position[0], 0, camera.position[2]))
-            scene.set_texture(texture)
-            
+            out_room, block = scene.move_test(avance)
+            if not block:
+                scene.camera.move_camera(avance)                
+                scene.set_player_position()
+            elif out_room >= 0 and out_room != scene.nb_room:
+                print("Retour Room:", out_room)
+                scene.set_room(out_room)
+        
         scene.display_scene()
         
         pygame.display.flip()
-        clock.tick(50)  # Limitez le framerate à 50 FPS
+        clock.tick(10)  # Limitez le framerate à 50 FPS

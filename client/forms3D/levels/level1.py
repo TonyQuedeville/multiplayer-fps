@@ -11,7 +11,7 @@
 
 level1=[
     ["bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-"],
-    ["bl-","md-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","bl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","bl-"],
+    ["bl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","bl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","bl-"],
     ["bl-","sl-","bl-","sl-","bl-","sl-","bl-","bl-","bl-","sl-","bl-","bl-","sl-","bl-","bl-","bl-","sl-","bl-","bl-","bl-","bl-","sl-","bl-","bl-","bl-","sl-","bl-","bl-","bl-","bl-","sl-","bl-"],
     ["bl-","bl-","bl-","sl-","bl-","sl-","sl-","sl-","sl-","sl-","bl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","bl-","sl-","bl-","sl-","sl-","sl-","sl-","bl-","sl-","sl-","sl-","bl-"],
     ["bl-","sl-","bl-","sl-","bl-","bl-","sl-","bl-","bl-","bl-","bl-","sl-","bl-","sl-","bl-","bl-","bl-","sl-","bl-","sl-","bl-","sl-","bl-","sl-","bl-","bl-","sl-","sl-","sl-","bl-","bl-","bl-"],
@@ -25,6 +25,6 @@ level1=[
     ["bl-","sl-","bl-","sl-","bl-","sl-","sl-","sl-","sl-","sl-","bl-","sl-","bl-","sl-","bl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","bl-","sl-","sl-","bl-","sl-","bl-","sl-","bl-","sl-","bl-"],
     ["bl-","sl-","bl-","sl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","sl-","bl-","bl-","bl-","bl-","bl-","bl-","sl-","bl-","bl-","bl-","bl-","bl-","sl-","bl-","sl-","bl-","bl-","bl-","sl-","bl-"],
     ["bl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","sl-","bl-"],
-    ["bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","ch-1","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-"],
+    ["bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","ch-0","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-","bl-"],
 ]
 player_position_init_1 = [15, 0, 15]

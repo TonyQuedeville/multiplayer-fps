@@ -43,7 +43,7 @@ def cube(position=(0,0,0), size=(0.90, 0.90, 0.90), rotate_angle=0, lines=False)
     )
     
     verticies = ()
-    if rotate_angle == 0:
+    if rotate_angle == 0 or rotate_angle == 360:
         vertices = (
             (x, y, z),                          # 0
             (x+size[0], y, z),                  # 1
@@ -79,7 +79,7 @@ def cube(position=(0,0,0), size=(0.90, 0.90, 0.90), rotate_angle=0, lines=False)
             (x, y, z),                          # 0 - 7
         )
         verticies = vertices
-    elif rotate_angle == -90:
+    elif rotate_angle == -90 or rotate_angle == 270:
         vertices = (
             (x+size[0], y, z),                  # 1 - 0
             (x+size[0], y, z-size[2]),          # 7 - 1

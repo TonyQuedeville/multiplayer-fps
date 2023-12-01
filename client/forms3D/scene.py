@@ -14,7 +14,10 @@ from OpenGL.GL import *
 # from OpenGL.GLU import *
 # from OpenGL.GLUT import *
 
-from forms3D.plane import plane
+from forms3D.camera import Camera
+from forms3D.textures import Texture
+
+from forms3D.plane import couloir, porte
 from forms3D.cube import cube
 from forms3D.sphere import sphere
 from forms3D.cylindre import cylindre
@@ -60,25 +63,150 @@ chiffre_orientation = {
 }
 
 class Scene():
-    def __init__(self, room=0, texture=None):
-        level = levels.get(room) # Niveau
+    def __init__(self, nb_room=0, nb_player=1):
+        self.nb_room = nb_room
+        
+        level = levels.get(nb_room) # Niveau
         self.room = level[0] # Salle d'exposition
+        self.size_room = (len(self.room[0]), len(self.room))
+        
+        self.player_position = level[1] # Position initial du joueur
+        self.player_x = self.player_position[0] + .5
+        self.player_y = self.player_position[1] 
+        self.player_z = self.player_position[2] - .5
+        
+        self.camera = Camera(position=self.player_position)
+        
+        self.texture = Texture(nb_room, nb_player) # Textures
+        self.texture.load_sols()
+        self.texture.load_eyes()
+        self.texture.load_chiffre()
+        self.texture.load_theme()
+        
+        self.med_rotate = 0 # Angle actuel des medaillons
+        self.med_rotate_angle = .1 # Angle de rotation des medaillons
+        self.med_rotate_axis = (1,0,0) # Axe de rotation des medaillons
+        
+        self.chiffre_rotate = 0 # Orientation des numero d'entrée au sol du hall d'accueil
+    
+    def set_room(self, nb_room):
+        self.nb_room = nb_room
+        level = levels.get(nb_room)
+        self.room = level[0]
+        self.size_room = (len(self.room[0]), len(self.room))
+        
         self.player_position = level[1] # position initial du joueur
         self.player_x = self.player_position[0] + .5
         self.player_y = self.player_position[1]
         self.player_z = self.player_position[2] - .5
-        self.texture = texture # texture active
-        self.med_rotate = 0 # Angle actuel des medaillons
-        self.med_rotate_angle = .1 # Angle de rotation des medaillons
-        self.med_rotate_axis = (1,0,0) # Axe de rotation des medaillons
-        self.chiffre_rotate = 0 # Orientation des numero d'entrée au sol du hall d'accueil
+        
+        self.texture.delete_theme()
+        self.texture.load_theme()
     
-    def set_room(self, room):
-        self.room = levels.get(room)[0]
+    def set_player_position(self):
+        self.player_x = self.camera.position[0]
+        self.player_y = self.camera.position[1]
+        self.player_z = self.camera.position[2]
     
-    def set_player_position(self, player_position):
-        self.player_x = player_position[0]
-        self.player_z = player_position[2]
+    def move_test(self, avance):
+        out_room = 0
+        block = False
+        
+        el_actuel = self.room[int(self.player_z+1)][int(self.player_x)]
+        print("moi coord: x =",self.player_x, "z =", self.player_z+1)
+        print("moi position: x =", int(self.player_x), "z =", int(self.player_z+1), "el:", el_actuel, "orient:", self.camera.rotate_angle, "avance:", avance)
+        
+        try:
+            z_plus = self.room[int(self.player_z+1.8)][int(self.player_x)]
+        except:
+            if self.nb_room != 0:
+                z_plus = "rm-0"
+        print("z_plus", z_plus)
+        
+        if self.player_z+.2 >= 0:
+            z_moins = self.room[int(self.player_z+.2)][int(self.player_x)]
+        else:
+            if self.nb_room != 0:
+                z_moins = "rm-0"
+        print("z_moins:", z_moins)
+        
+        try:
+            x_plus = self.room[int(self.player_z+1)][int(self.player_x+.8)]
+        except:
+            if self.nb_room != 0:
+                x_plus = "rm-0"
+        print("x_plus", x_plus)
+        
+        if int(self.player_x-.2) >= 0:
+            x_moins = self.room[int(self.player_z+1)][int(self.player_x-.2)]
+        else:
+            if self.nb_room != 0:
+                x_moins = "rm-0"
+        print("x_moins", x_moins)
+        
+        if el_actuel.split('-')[0] == "sl" or el_actuel.split('-')[0] == "ch": # Si je suis sur le sol
+            out_room = -1
+            
+            if avance < 0: # Si j'avance
+                # Labyrinth Avant
+                if self.camera.rotate_angle == 90 and self.player_z+1 < int(self.player_z+1)+.2:
+                    if z_moins.split('-')[0] != "sl" and z_moins.split('-')[0] != "ch" and z_moins.split('-')[0] != "rm":
+                        block = True
+                    elif z_moins.split('-')[0] == "rm":
+                        out_room = int(z_moins.split('-')[1])
+                        print("out_room", out_room)
+                        return out_room, True                    
+                # Labyrinth Arrière
+                elif self.camera.rotate_angle == 270 and self.player_z+1 > int(self.player_z+1)+.8:
+                    if z_plus.split('-')[0] != "sl" and z_plus.split('-')[0] != "ch" and z_plus.split('-')[0] != "rm":
+                        block = True
+                    elif z_plus.split('-')[0] == "rm":
+                        out_room = int(z_plus.split('-')[1])
+                        print("out_room", out_room)
+                        return out_room, True                    
+                # Labyrinth Gauche
+                elif self.camera.rotate_angle == 0 and self.player_x < int(self.player_x)+.2:
+                    if x_moins.split('-')[0] != "sl" and x_moins.split('-')[0] != "ch" and x_moins.split('-')[0] != "rm":
+                        block = True
+                    elif x_moins.split('-')[0] == "rm":
+                        out_room = int(x_moins.split('-')[1])
+                        print("out_room", out_room)
+                        return out_room, True
+                # Labyrinth Droite
+                elif self.camera.rotate_angle == 180 and self.player_x > int(self.player_x)+.8:
+                    if x_plus.split('-')[0] != "sl" and x_plus.split('-')[0] != "ch" and x_plus.split('-')[0] != "rm":
+                        block = True
+                    elif x_plus.split('-')[0] == "rm":
+                        out_room = int(x_plus.split('-')[1])
+                        print("out_room", out_room)
+                        return out_room, True
+                else:
+                    block = False
+            
+            else: # Si je recule (comment veux tu ... ?)
+                # Labyrinth Avant
+                if self.camera.rotate_angle == 270 and self.player_z+1 < int(self.player_z+1)+.2:
+                    if z_moins.split('-')[0] != "sl" and z_moins.split('-')[0] != "ch":
+                        block = True
+                # Labyrinth Arrière
+                elif self.camera.rotate_angle == 90 and self.player_z+1 > int(self.player_z+1)+.8:
+                    if z_plus.split('-')[0] != "sl" and z_moins.split('-')[0] != "ch":
+                        block = True
+                # Labyrinth Gauche
+                elif self.camera.rotate_angle == 180 and self.player_x < int(self.player_x)+.2:
+                    if x_moins.split('-')[0] != "sl" and z_moins.split('-')[0] != "ch":
+                        block = True
+                # Labyrinth Droite
+                elif self.camera.rotate_angle == 0 and self.player_x > int(self.player_x)+.8:
+                    if x_plus.split('-')[0] != "sl" and z_moins.split('-')[0] != "ch":
+                        block = True
+                else:
+                    block = False
+        else:
+            out_room = 0
+            block = True
+        
+        return out_room, block
     
     def set_texture(self, texture):
         self.texture = texture # texture active
@@ -108,18 +236,16 @@ class Scene():
                         elif prefixe_form == "ch":
                             self.texture.apply_chiffre(nb)
                             self.chiffre_rotate = chiffre_orientation.get(nb)
-                        else:
-                            print("erreur prefixe !")
-                        
+                
                 self.forms(prefixe_form, (x-self.player_x, -0.5, y-self.player_z))
                 value_change = value                    
 
     def forms(self, prefixe_form, coord):
         switcher = {
-            "sl": lambda: plane(coord),
+            "sl": lambda: couloir(coord),
             "ml": lambda: cube(coord),
             "bl": lambda: cube(coord),
-            "ch": lambda: cube((coord[0], -1, coord[2]), (.98, .01, .98), self.chiffre_rotate),
+            "ch": lambda: porte(coord, (.98, .01, .98), self.chiffre_rotate),
             "sp": lambda: sphere(coord, .5),
             "pl": lambda: sphere(coord, .10, 2),
             "cl": lambda: cylindre(coord, .5, .2),

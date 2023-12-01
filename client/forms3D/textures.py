@@ -17,7 +17,7 @@ from forms3D.levels.level1 import level1
 # -----------------------------------------------------------------------------------------------
 
 class Texture():
-    def __init__(self, room=0, player_nb=0) -> None:
+    def __init__(self, room=0, nb_player=1) -> None:
         self.room = room # Numero d'étage
         
         # Texture des sols
@@ -27,17 +27,12 @@ class Texture():
         ]
         self.sols_id = []
         
-        # Texture des eyes des joueurs
+        # Texture des eyes, joueurs
         self.dir_eyes = "eyes"
         self.eyes = [
             "eye-1.jpg",
         ] 
         self.eyes_id = []
-        
-        # Oeuvres du theme d'exposition
-        self.dir_theme = ""
-        self.theme = []
-        self.theme_id = []
         
         # Texture des chiffres
         self.dir_chiffres = "chiffres"
@@ -54,6 +49,11 @@ class Texture():
             "chiffre9.jpg",
         ] 
         self.chiffres_id = []
+        
+        # Oeuvres du theme d'exposition
+        self.dir_theme = ""
+        self.theme = []
+        self.theme_id = []
 
     # Chargement des sols
     def load_sols(self):
@@ -94,7 +94,13 @@ class Texture():
             self.dir_theme = "swim"
         self.read_folder()
         self.theme_id = self.load_textures(self.dir_theme, self.theme)
-        
+    
+    # Supprimer les textures theme
+    def delete_theme(self):
+        for texture_id in self.theme_id[self.dir_theme]:
+            glDeleteTextures(texture_id)
+        self.theme_id = []
+    
     # Chargement des chiffres
     def load_chiffre(self):
         self.chiffres_id = self.load_textures(self.dir_chiffres, self.chiffres)
@@ -136,12 +142,12 @@ class Texture():
     def apply_eyes(self, id):
         glBindTexture(GL_TEXTURE_2D, self.eyes_id[id])
     
+        # Application des chiffres
+    def apply_chiffre(self, id):
+        glBindTexture(GL_TEXTURE_2D, self.chiffres_id[id])
+    
     # Application de l'oeuvre
     def apply_theme(self, id):
         glBindTexture(GL_TEXTURE_2D, self.theme_id[id])
-        
-    # Application des chiffres
-    def apply_chiffre(self, id):
-        glBindTexture(GL_TEXTURE_2D, self.chiffres_id[id])
 
 # -----------------------------------------------------------------------------------------------
