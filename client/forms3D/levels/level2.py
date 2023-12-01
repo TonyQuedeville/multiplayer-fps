@@ -28,3 +28,4 @@ level2=[
     ["bl-01","bl-02","bl-02","bl-02","bl-04","bl-02","bl-04","bl-02","bl-04","bl-02","bl-01","ch-02","bl-01","bl-01","bl-01","bl-01","bl-01","bl-01","bl-01","bl-01","bl-01","bl-01","bl-01","bl-01","bl-01","bl-03","bl-03","bl-03","bl-03","bl-03","bl-03","bl-03"],
 ]
 player_position_init_2 = [11, 0, 15]
+player_orientation_init_2 = 90

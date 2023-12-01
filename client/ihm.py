@@ -51,7 +51,7 @@ def initIHM():
     fenetre_pygame = pygame.display.set_mode((largeur, hauteur), flags)
     
     # Initialisation Room 0
-    scene = Scene(1)
+    scene = Scene(0)
 
     avance = 0 # Valeur d'avance (recul si < 0)
 
@@ -69,7 +69,7 @@ def initIHM():
     glEnable(GL_NORMALIZE)
     glEnable(GL_COLOR_MATERIAL)
     
-    # Changement de projection des oeuvres à intervals régulier
+    # Changement aléatoire de projection des oeuvres à intervals régulier
     theme_thread = threading.Thread(target=image_random, args=(scene,))
     theme_thread.daemon = True
     theme_thread.start()
@@ -138,9 +138,10 @@ def initIHM():
             if not block:
                 scene.camera.move_camera(avance)                
                 scene.set_player_position()
-            elif out_room >= 0 and out_room != scene.nb_room:
-                print("Retour Room:", out_room)
+            elif out_room >= 0 and out_room != scene.nb_room: # Changement de salle
+                avance = 0
                 scene.set_room(out_room)
+                scene.set_player_position()
         
         scene.display_scene()
         

@@ -12,13 +12,11 @@ import os
 import pygame
 from OpenGL.GL import *
 
-from forms3D.levels.level1 import level1
-
 # -----------------------------------------------------------------------------------------------
 
 class Texture():
-    def __init__(self, room=0, nb_player=1) -> None:
-        self.room = room # Numero d'étage
+    def __init__(self, nb_room=0, nb_player=1) -> None:
+        self.nb_room = nb_room # Numero de la salle
         
         # Texture des sols
         self.dir_sols = "textures"
@@ -65,40 +63,45 @@ class Texture():
     
     # Chargement des oeuvres en fonction du theme d'exposition
     def load_theme(self):
-        if self.room == 0:
+        if self.nb_room == 0:
             # hall d'accueil
             self.dir_theme = "museum"
-        elif self.room == 1:
+        elif self.nb_room == 1:
             # 1ère salle, fusion
             self.dir_theme = "fusion"
-        elif self.room == 2:
+        elif self.nb_room == 2:
             # 2ème salle, tableaux
             self.dir_theme = "tableaux"
-        elif self.room == 3:
+        elif self.nb_room == 3:
             # 3ème salle, danse
             self.dir_theme = "danse"
-        elif self.room == 4:
+        elif self.nb_room == 4:
             # 4ème salle, jump
             self.dir_theme = "jump"
-        elif self.room == 5:
+        elif self.nb_room == 5:
             # 5ème salle, abstrait
             self.dir_theme = "abstrait"
-        elif self.room == 6:
+        elif self.nb_room == 6:
             # 6ème salle, fantaisie
             self.dir_theme = "fantaisie"
-        elif self.room == 7:
+        elif self.nb_room == 7:
             # 7ème salle, noir-et-blanc
             self.dir_theme = "noir-et-blanc"
-        elif self.room == 8:
+        elif self.nb_room == 8:
             # 8ème salle, swim
             self.dir_theme = "swim"
-        self.read_folder()
-        self.theme_id = self.load_textures(self.dir_theme, self.theme)
+            
+        if self.dir_theme != "":
+            self.read_folder()
+            self.theme_id = self.load_textures(self.dir_theme, self.theme)
     
     # Supprimer les textures theme
     def delete_theme(self):
-        for texture_id in self.theme_id[self.dir_theme]:
-            glDeleteTextures(texture_id)
+        for texture_id in self.theme_id:
+            error = glDeleteTextures(texture_id)
+            if error:
+                print("Erreur delete_theme:", error)
+        self.theme = []
         self.theme_id = []
     
     # Chargement des chiffres

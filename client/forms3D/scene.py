@@ -38,15 +38,15 @@ from forms3D.levels.level8 import *
 # globals:
 
 levels = {
-    0: (level0, player_position_init_0),
-    1: (level1, player_position_init_1),
-    2: (level2, player_position_init_2),
-    3: (level3, player_position_init_3),
-    4: (level4, player_position_init_4),
-    5: (level5, player_position_init_5),
-    6: (level6, player_position_init_6),
-    7: (level7, player_position_init_7),
-    8: (level8, player_position_init_8),
+    0: (level0, player_position_init_0, player_orientation_init_0),
+    1: (level1, player_position_init_1, player_orientation_init_1),
+    2: (level2, player_position_init_2, player_orientation_init_2),
+    3: (level3, player_position_init_3, player_orientation_init_3),
+    4: (level4, player_position_init_4, player_orientation_init_4),
+    5: (level5, player_position_init_5, player_orientation_init_5),
+    6: (level6, player_position_init_6, player_orientation_init_6),
+    7: (level7, player_position_init_7, player_orientation_init_7),
+    8: (level8, player_position_init_8, player_orientation_init_8),
 }
 
 chiffre_orientation = {
@@ -74,6 +74,7 @@ class Scene():
         self.player_x = self.player_position[0] + .5
         self.player_y = self.player_position[1] 
         self.player_z = self.player_position[2] - .5
+        self.player_orientation = level[2] # Orientation initial du joueur
         
         self.camera = Camera(position=self.player_position)
         
@@ -91,14 +92,16 @@ class Scene():
     
     def set_room(self, nb_room):
         self.nb_room = nb_room
+        self.texture.nb_room = nb_room
         level = levels.get(nb_room)
         self.room = level[0]
         self.size_room = (len(self.room[0]), len(self.room))
         
-        self.player_position = level[1] # position initial du joueur
+        self.player_position = level[1] # Position initial du joueur
         self.player_x = self.player_position[0] + .5
         self.player_y = self.player_position[1]
         self.player_z = self.player_position[2] - .5
+        self.camera.position = (self.player_x, self.player_y, self.player_z)
         
         self.texture.delete_theme()
         self.texture.load_theme()
@@ -112,37 +115,32 @@ class Scene():
         out_room = 0
         block = False
         
-        el_actuel = self.room[int(self.player_z+1)][int(self.player_x)]
-        print("moi coord: x =",self.player_x, "z =", self.player_z+1)
-        print("moi position: x =", int(self.player_x), "z =", int(self.player_z+1), "el:", el_actuel, "orient:", self.camera.rotate_angle, "avance:", avance)
+        el_actuel = self.room[int(self.player_z+1)][int(self.player_x)] # Elément sur ma position
+        print("ma position:", el_actuel, "x:",int(self.player_x), "z:",int(self.player_z+1), "Orientation:", self.camera.rotate_angle)
         
         try:
-            z_plus = self.room[int(self.player_z+1.8)][int(self.player_x)]
+            z_plus = self.room[int(self.player_z+1.8)][int(self.player_x)] # Elément Arrière (de la scene) par rapport à ma position
         except:
             if self.nb_room != 0:
                 z_plus = "rm-0"
-        print("z_plus", z_plus)
         
         if self.player_z+.2 >= 0:
-            z_moins = self.room[int(self.player_z+.2)][int(self.player_x)]
+            z_moins = self.room[int(self.player_z+.2)][int(self.player_x)] # Elément Avant (de la scene) par rapport à ma position
         else:
             if self.nb_room != 0:
                 z_moins = "rm-0"
-        print("z_moins:", z_moins)
         
         try:
-            x_plus = self.room[int(self.player_z+1)][int(self.player_x+.8)]
+            x_plus = self.room[int(self.player_z+1)][int(self.player_x+.8)] # Elément Droite (de la scene) par rapport à ma position
         except:
             if self.nb_room != 0:
                 x_plus = "rm-0"
-        print("x_plus", x_plus)
         
         if int(self.player_x-.2) >= 0:
-            x_moins = self.room[int(self.player_z+1)][int(self.player_x-.2)]
+            x_moins = self.room[int(self.player_z+1)][int(self.player_x-.2)] # Elément Gauche (de la scene) par rapport à ma position
         else:
             if self.nb_room != 0:
                 x_moins = "rm-0"
-        print("x_moins", x_moins)
         
         if el_actuel.split('-')[0] == "sl" or el_actuel.split('-')[0] == "ch": # Si je suis sur le sol
             out_room = -1
@@ -154,7 +152,6 @@ class Scene():
                         block = True
                     elif z_moins.split('-')[0] == "rm":
                         out_room = int(z_moins.split('-')[1])
-                        print("out_room", out_room)
                         return out_room, True                    
                 # Labyrinth Arrière
                 elif self.camera.rotate_angle == 270 and self.player_z+1 > int(self.player_z+1)+.8:
@@ -162,7 +159,6 @@ class Scene():
                         block = True
                     elif z_plus.split('-')[0] == "rm":
                         out_room = int(z_plus.split('-')[1])
-                        print("out_room", out_room)
                         return out_room, True                    
                 # Labyrinth Gauche
                 elif self.camera.rotate_angle == 0 and self.player_x < int(self.player_x)+.2:
@@ -170,7 +166,6 @@ class Scene():
                         block = True
                     elif x_moins.split('-')[0] == "rm":
                         out_room = int(x_moins.split('-')[1])
-                        print("out_room", out_room)
                         return out_room, True
                 # Labyrinth Droite
                 elif self.camera.rotate_angle == 180 and self.player_x > int(self.player_x)+.8:
@@ -178,7 +173,6 @@ class Scene():
                         block = True
                     elif x_plus.split('-')[0] == "rm":
                         out_room = int(x_plus.split('-')[1])
-                        print("out_room", out_room)
                         return out_room, True
                 else:
                     block = False
@@ -279,4 +273,4 @@ class Scene():
                     elif prefixe_form == "md":
                         self.room[y][x] = f"md-{random.randint(0, nb_tex)}"
         else:
-            print("Niveau non trouvé pour cet étage.")
+            print("Niveau non trouvé pour cette salle !")
