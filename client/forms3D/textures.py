@@ -48,6 +48,21 @@ class Texture():
         ] 
         self.chiffres_id = []
         
+        # Texture des grooms
+        self.dir_grooms = "grooms"
+        self.grooms = [
+            "groom-0.png",
+            "groom-1.png",
+            "groom-2.png",
+            "groom-3.png",
+            "groom-4.png",
+            "groom-5.png",
+            "groom-6.png",
+            "groom-7.png",
+            "groom-8.png",
+        ] 
+        self.grooms_id = []
+        
         # Oeuvres du theme d'exposition
         self.dir_theme = ""
         self.theme = []
@@ -60,6 +75,14 @@ class Texture():
     # Chargement des yeux des joueurs
     def load_eyes(self):
         self.eyes_id = self.load_textures(self.dir_eyes, self.eyes)
+        
+    # Chargement des chiffres
+    def load_chiffre(self):
+        self.chiffres_id = self.load_textures(self.dir_chiffres, self.chiffres)
+    
+    # Chargement des grooms
+    def load_grooms(self):
+        self.grooms_id = self.load_textures(self.dir_grooms, self.grooms)
     
     # Chargement des oeuvres en fonction du theme d'exposition
     def load_theme(self):
@@ -104,10 +127,6 @@ class Texture():
         self.theme = []
         self.theme_id = []
     
-    # Chargement des chiffres
-    def load_chiffre(self):
-        self.chiffres_id = self.load_textures(self.dir_chiffres, self.chiffres)
-    
     # Récuration de la liste des fichiers du theme
     def read_folder(self):
         for root, dirs, files in os.walk("img/" + self.dir_theme):
@@ -145,9 +164,13 @@ class Texture():
     def apply_eyes(self, id):
         glBindTexture(GL_TEXTURE_2D, self.eyes_id[id])
     
-        # Application des chiffres
+    # Application des chiffres
     def apply_chiffre(self, id):
         glBindTexture(GL_TEXTURE_2D, self.chiffres_id[id])
+    
+    # Application des grooms
+    def apply_groom(self, id):
+        glBindTexture(GL_TEXTURE_2D, self.grooms_id[id])
     
     # Application de l'oeuvre
     def apply_theme(self, id):

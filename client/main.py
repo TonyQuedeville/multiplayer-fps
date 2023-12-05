@@ -14,8 +14,7 @@ from ihm import initIHM
 # -----------------------------------------------------------------------------------------------
 
 def main():
-    initIHM()
-    # initUDPClient()
+    initUDPClient()
 
 if __name__ == "__main__":
     main()

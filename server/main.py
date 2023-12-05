@@ -9,13 +9,11 @@
 # -----------------------------------------------------------------------------------------------
 #  imports:
 from server import initUDPServer
-from game import initGame
 
 # -----------------------------------------------------------------------------------------------
 
 def main():
     initUDPServer()
-    initGame()
 
 if __name__ == "__main__":
     main()

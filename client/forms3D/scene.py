@@ -9,6 +9,7 @@
 # -----------------------------------------------------------------------------------------------
 #  imports:
 import random
+import threading, time
 
 from OpenGL.GL import *
 # from OpenGL.GLU import *
@@ -19,6 +20,7 @@ from forms3D.textures import Texture
 
 from forms3D.plane import couloir, porte
 from forms3D.cube import cube
+from forms3D.groom import groom
 from forms3D.sphere import sphere
 from forms3D.cylindre import cylindre
 from forms3D.tetra import tetra
@@ -75,13 +77,21 @@ class Scene():
         self.player_y = self.player_position[1] 
         self.player_z = self.player_position[2] - .5
         self.player_orientation = level[2] # Orientation initial du joueur
+        self.player = {
+            "player_nb_room" : self.nb_room,
+            "player_position" : self.player_position,
+            "player_coord" : (self.player_x, self.player_y, self.player_z),
+            "player_orientation" : self.player_orientation,
+            "player_nb_medaillon": 0,
+        }
         
-        self.camera = Camera(position=self.player_position)
+        self.camera = Camera(position=(self.player_x, self.player_y, self.player_z))
         
         self.texture = Texture(nb_room, nb_player) # Textures
         self.texture.load_sols()
         self.texture.load_eyes()
         self.texture.load_chiffre()
+        self.texture.load_grooms()
         self.texture.load_theme()
         
         self.med_rotate = 0 # Angle actuel des medaillons
@@ -89,6 +99,17 @@ class Scene():
         self.med_rotate_axis = (1,0,0) # Axe de rotation des medaillons
         
         self.chiffre_rotate = 0 # Orientation des numero d'entrée au sol du hall d'accueil
+        
+    def animations_scene(self):
+        # Changement aléatoire de projection des oeuvres à intervals régulier
+        self.theme_thread = threading.Thread(target=self.image_random)
+        self.theme_thread.daemon = True
+        self.theme_thread.start()
+        
+        # Rotation des médaillons    
+        med_thread = threading.Thread(target=self.objet_rotate)
+        med_thread.daemon = True
+        med_thread.start()
     
     def set_room(self, nb_room):
         self.nb_room = nb_room
@@ -110,13 +131,25 @@ class Scene():
         self.player_x = self.camera.position[0]
         self.player_y = self.camera.position[1]
         self.player_z = self.camera.position[2]
+        self.player = {
+            "player_nb_room" : self.nb_room,
+            "player_position" : self.player_position,
+            "player_coord" : (self.player_x, self.player_y, self.player_z),
+            "player_orientation" : self.player_orientation,
+            "player_nb_medaillon": 0,
+        }
+    
+    def set_player_orientation(self, angle):
+        self.player_orientation += angle
+        if self.player_orientation > 360: self.player_orientation -= 360
+        elif self.player_orientation < 0: self.player_orientation += 360
     
     def move_test(self, avance):
         out_room = 0
         block = False
         
         el_actuel = self.room[int(self.player_z+1)][int(self.player_x)] # Elément sur ma position
-        print("ma position:", el_actuel, "x:",int(self.player_x), "z:",int(self.player_z+1), "Orientation:", self.camera.rotate_angle)
+        # print("ma position:", el_actuel, "x:",int(self.player_x), "z:",int(self.player_z+1), "Orientation:", self.camera.rotate_angle)
         
         try:
             z_plus = self.room[int(self.player_z+1.8)][int(self.player_x)] # Elément Arrière (de la scene) par rapport à ma position
@@ -200,6 +233,9 @@ class Scene():
             out_room = 0
             block = True
         
+        self.player_position = (int(self.player_x), 0, int(self.player_z+1))
+        self.player_orientation = self.camera.rotate_angle
+        
         return out_room, block
     
     def set_texture(self, texture):
@@ -221,7 +257,7 @@ class Scene():
                     if prefixe_form != "  ":
                         nb = int(value.split('-')[-1])
                         
-                        if prefixe_form == "sl" or prefixe_form == "ml" or prefixe_form == "sp" or prefixe_form == "cl":
+                        if prefixe_form == "sl" or prefixe_form == "sp" or prefixe_form == "ml" or prefixe_form == "cl":
                             self.texture.apply_sols(nb)
                         elif prefixe_form == "pl":
                             self.texture.apply_eyes(nb)
@@ -229,6 +265,9 @@ class Scene():
                             self.texture.apply_theme(nb)
                         elif prefixe_form == "ch":
                             self.texture.apply_chiffre(nb)
+                            self.chiffre_rotate = chiffre_orientation.get(nb)
+                        elif prefixe_form == "rm":
+                            self.texture.apply_groom(nb)
                             self.chiffre_rotate = chiffre_orientation.get(nb)
                 
                 self.forms(prefixe_form, (x-self.player_x, -0.5, y-self.player_z))
@@ -244,6 +283,7 @@ class Scene():
             "pl": lambda: sphere(coord, .10, 2),
             "cl": lambda: cylindre(coord, .5, .2),
             "md": lambda: cylindre((coord[0], -.1, coord[2]), .05, .01, self.med_rotate),
+            "rm": lambda: groom(coord, (.5, .5, 0), self.chiffre_rotate, self.nb_room),
         }
 
         func = switcher.get(prefixe_form, lambda: "nb_form invalide")
@@ -274,3 +314,21 @@ class Scene():
                         self.room[y][x] = f"md-{random.randint(0, nb_tex)}"
         else:
             print("Niveau non trouvé pour cette salle !")
+            
+    # Changement de projection des oeuvres à intervals régulier
+    def image_random(self, timer=2):
+        if timer > 0:
+            while True:
+                self.random_theme()
+                time.sleep(timer)
+        else:
+            self.random_theme()
+
+    # Rotation d'un objet
+    def objet_rotate(self, timer=.1):
+        if timer > 0 and self.med_rotate_angle != 0 and self.med_rotate_axis != (0,0,0):
+            while True:
+                self.set_med_rotate(self.med_rotate + self.med_rotate_angle)
+                if self.med_rotate >= 360:
+                    self.med_rotate = 0
+                time.sleep(timer)
