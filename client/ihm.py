@@ -20,31 +20,44 @@ from OpenGL.GLU import gluPerspective, gluLookAt
 # import pyBullet # simulation physique
 
 from forms3D.scene import Scene
+from players import Players
+
+# -----------------------------------------------------------------------------------------------
+#  Globals
+players = Players()
 
 # -----------------------------------------------------------------------------------------------
 # Pygame : interface de jeu
 
+def get_ihm_players():
+    return players
+
 def send_sever(scene, serveur_port, serveur_ip, client_socket):
-    data = {
-            "play" : {
-                "player_nb_room" : scene.nb_room,
-                "player_position" : scene.player_position,
-                "player_coord" : (scene.player_x, scene.player_y, scene.player_z),
-                "player_orientation" : scene.player_orientation,
+    if scene == "quit":
+        data = {"quit" : "quit"}
+    else:
+        data = {
+                "play" : {
+                    "player_nb_room" : scene.nb_room,
+                    "player_position" : scene.player_position,
+                    "player_coord" : (scene.player_x, scene.player_y, scene.player_z),
+                    "player_orientation" : scene.player_orientation,
+                }
             }
-        }
+    
     if serveur_ip and data:
         serialized_data = pickle.dumps(data)
         client_socket.sendto(serialized_data, (serveur_ip, serveur_port))
 
-def initIHM(serveur_port, serveur_ip, client_socket):
+def initIHM(serveur_port, serveur_ip, client_socket, pseudo):
     # Fenêtre pygame
     pygame.init()
-    largeur, hauteur = 1200, 600
+    largeur, hauteur = 800, 600
     flags = DOUBLEBUF|OPENGL  # Mode 1200x600
     # flags = pygame.FULLSCREEN | pygame.DOUBLEBUF | OPENGL | pygame.HWSURFACE # Mode plein écran
     # Créez la fenêtre Pygame
     fenetre_pygame = pygame.display.set_mode((largeur, hauteur), flags)
+    pygame.display.set_caption("Tony Quedeville 27/11/2024. Projet Zone01 : multi players fps.                           player : " + str(pseudo))
     
     # Initialisation Room 0
     scene = Scene(0)
@@ -60,13 +73,13 @@ def initIHM(serveur_port, serveur_ip, client_socket):
     last_time = time.time() # Timer pour l'appuis constant sur avance
 
     # Fenêtre pyOpenGL
-    gluPerspective(60, (largeur/hauteur), 0.1, 50.0)
+    gluPerspective(30, (largeur/hauteur), 0.1, 50.0)
     glEnable(GL_DEPTH_TEST)
     glEnable(GL_NORMALIZE)
     glEnable(GL_COLOR_MATERIAL)
     
     scene.animations_scene()
-
+    
     # Méthode de deplacement et rotation de la scene
     while True:
         # Timer pour l'appuis constant sur avance
@@ -78,10 +91,12 @@ def initIHM(serveur_port, serveur_ip, client_socket):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+                send_sever("quit", serveur_port, serveur_ip, client_socket)
                 return False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
+                    send_sever("quit", serveur_port, serveur_ip, client_socket)
                     return False
                 
                 elif event.key == pygame.K_LEFT:
@@ -138,7 +153,7 @@ def initIHM(serveur_port, serveur_ip, client_socket):
                 scene.set_player_position()
                 send_sever(scene, serveur_port, serveur_ip, client_socket)
         
-        scene.display_scene()
+        scene.display_scene(players)
         
         pygame.display.flip()
-        clock.tick(50)  # Limitez le framerate à 50 FPS
+        clock.tick(10)  # Limitez le framerate à 50 FPS

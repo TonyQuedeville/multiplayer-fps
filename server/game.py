@@ -18,35 +18,73 @@ class Game():
         self.nb_players = len(self.players)
     
     def get_player_by_id(self, id):
-        found_player = next((player for player in self.players if player.id == id), None)
-        return found_player
+        for player in self.players:
+            if player.id == id:
+                return player
+        return None
+    
+    def get_player_id_by_id_client(self, id):
+        for i, player in enumerate(self.players):
+            if player.id == id:
+                return i
+        return None
     
     def add_player(self, id, pseudo):
         player = Player(id, pseudo)
         self.players.append(player)
-        return {"addPlayer" : "Bienvenu " + pseudo + ", bonne visite !"}
+        return {"addPlayer" : {
+                        "id": player.id,
+                        "pseudo": player.pseudo,
+                        "player_nb_room" : player.player_nb_room,
+                        "player_position" : player.player_position,
+                        "player_coord": player.player_coord,
+                        "player_orientation": player.player_orientation,
+                        # "player_nb_medaillon": player.player_nb_medaillon,
+                    }
+                }
     
-    def sup_player(self, id, pseudo):
+    def sup_player(self, id):
         player = self.get_player_by_id(id)
         if player:
             self.players.remove(player)
-            return {"supPlayer" : pseudo + " a quitté le jeu !"}
+            return {"supPlayer" : player.id,}
         else:
             return None
     
     def update_player(self, id, data):
         player = self.get_player_by_id(id)
         if player:
-            player.nb_room = data["player_nb_room"]
+            player.player_nb_room = data["player_nb_room"]
             player.player_position = data["player_position"]
             player.player_coord = data["player_coord"]
             player.player_orientation = data["player_orientation"]
-            player.nb_medaillon = data["player_nb_medaillon"]
-            return {"players" : self.players}
+            # player.player_nb_medaillon = data["player_nb_medaillon"]
+            return {"player" : {
+                        "id": player.id,
+                        "pseudo": player.pseudo,
+                        "player_nb_room" : player.player_nb_room,
+                        "player_position" : player.player_position,
+                        "player_coord": player.player_coord,
+                        "player_orientation": player.player_orientation,
+                        # "player_nb_medaillon": player.player_nb_medaillon,
+                    }
+                }
         else:
             return None
-        
     
-    def set_medaillon(self, id):
-        player = self.get_player_by_id(id)
-        player.set_medaillon()
+    def init_players(self):
+        players = []
+        for player in self.players:
+            players.append({
+                            "id": player.id,
+                            "pseudo": player.pseudo,
+                            "player_nb_room" : player.player_nb_room,
+                            "player_position" : player.player_position,
+                            "player_coord": player.player_coord,
+                            "player_orientation": player.player_orientation,
+                            # "player_nb_medaillon": player.player_nb_medaillon,
+                            })
+        return {"init_players" : players}
+    
+    def init_levels(self):
+        pass

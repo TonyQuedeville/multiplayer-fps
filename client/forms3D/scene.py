@@ -82,7 +82,7 @@ class Scene():
             "player_position" : self.player_position,
             "player_coord" : (self.player_x, self.player_y, self.player_z),
             "player_orientation" : self.player_orientation,
-            "player_nb_medaillon": 0,
+            # "player_nb_medaillon": 0,
         }
         
         self.camera = Camera(position=(self.player_x, self.player_y, self.player_z))
@@ -99,17 +99,20 @@ class Scene():
         self.med_rotate_axis = (1,0,0) # Axe de rotation des medaillons
         
         self.chiffre_rotate = 0 # Orientation des numero d'entrée au sol du hall d'accueil
+    
+    def animations_scene(self, timer=2):
+        if timer == 0:
+            self.random_theme()
+        else:
+            # Changement aléatoire de projection des oeuvres à intervals régulier
+            self.theme_thread = threading.Thread(target=self.image_random, args=(timer,))
+            self.theme_thread.daemon = True
+            self.theme_thread.start()
         
-    def animations_scene(self):
-        # Changement aléatoire de projection des oeuvres à intervals régulier
-        self.theme_thread = threading.Thread(target=self.image_random)
-        self.theme_thread.daemon = True
-        self.theme_thread.start()
-        
-        # Rotation des médaillons    
-        med_thread = threading.Thread(target=self.objet_rotate)
-        med_thread.daemon = True
-        med_thread.start()
+            # Rotation des médaillons    
+            med_thread = threading.Thread(target=self.objet_rotate)
+            med_thread.daemon = True
+            med_thread.start()
     
     def set_room(self, nb_room):
         self.nb_room = nb_room
@@ -136,12 +139,12 @@ class Scene():
             "player_position" : self.player_position,
             "player_coord" : (self.player_x, self.player_y, self.player_z),
             "player_orientation" : self.player_orientation,
-            "player_nb_medaillon": 0,
+            # "player_nb_medaillon": 0,
         }
     
     def set_player_orientation(self, angle):
         self.player_orientation += angle
-        if self.player_orientation > 360: self.player_orientation -= 360
+        if self.player_orientation >= 360: self.player_orientation -= 360
         elif self.player_orientation < 0: self.player_orientation += 360
     
     def move_test(self, avance):
@@ -247,7 +250,7 @@ class Scene():
     def set_med_rotate_axis(self, axis):
         self.med_rotate_axis = axis
 
-    def display_scene(self):
+    def display_scene(self, players):
         # Formes en fonction de la salle
         value_change = ""
         for y, lig in enumerate(self.room):
@@ -258,9 +261,7 @@ class Scene():
                         nb = int(value.split('-')[-1])
                         
                         if prefixe_form == "sl" or prefixe_form == "sp" or prefixe_form == "ml" or prefixe_form == "cl":
-                            self.texture.apply_sols(nb)
-                        elif prefixe_form == "pl":
-                            self.texture.apply_eyes(nb)
+                            self.texture.apply_sols(nb)                            
                         elif prefixe_form == "bl" or prefixe_form == "md":
                             self.texture.apply_theme(nb)
                         elif prefixe_form == "ch":
@@ -270,20 +271,26 @@ class Scene():
                             self.texture.apply_groom(nb)
                             self.chiffre_rotate = chiffre_orientation.get(nb)
                 
-                self.forms(prefixe_form, (x-self.player_x, -0.5, y-self.player_z))
-                value_change = value                    
+                self.forms(prefixe_form, (x-self.player_x, -0.5, y-self.player_z), self.player_position)
+                value_change = value 
+        
+        if players.players:
+            for player in players.players:
+                eye = 2
+                if player.pseudo == "toto":
+                    eye = 0
+                self.texture.apply_eyes(eye)
+                self.forms("pl", player.player_coord, (self.player_x, -0.5, self.player_z))
 
-    def forms(self, prefixe_form, coord):
+    def forms(self, prefixe_form, coord, position):
         switcher = {
-            "sl": lambda: couloir(coord),
-            "ml": lambda: cube(coord),
-            "bl": lambda: cube(coord),
-            "ch": lambda: porte(coord, (.98, .01, .98), self.chiffre_rotate),
-            "sp": lambda: sphere(coord, .5),
-            "pl": lambda: sphere(coord, .10, 2),
-            "cl": lambda: cylindre(coord, .5, .2),
-            "md": lambda: cylindre((coord[0], -.1, coord[2]), .05, .01, self.med_rotate),
-            "rm": lambda: groom(coord, (.5, .5, 0), self.chiffre_rotate, self.nb_room),
+            "sl": lambda: couloir(coord), # Sol + plafond
+            "ml": lambda: cube(coord), # Block mur
+            "bl": lambda: cube(coord), # Block image
+            "ch": lambda: porte(coord, (.98, .01, .98), self.chiffre_rotate), # Chiffre au sol + plafond
+            "pl": lambda: sphere(coord, position, .10, 2), # Oeil de player
+            "md": lambda: cylindre((coord[0], -.1, coord[2]), .05, .01, self.med_rotate), # Medaillon
+            "rm": lambda: groom(coord, (.5, .5, 0), self.chiffre_rotate, self.nb_room), # Groom aux portes des rooms
         }
 
         func = switcher.get(prefixe_form, lambda: "nb_form invalide")
@@ -316,7 +323,7 @@ class Scene():
             print("Niveau non trouvé pour cette salle !")
             
     # Changement de projection des oeuvres à intervals régulier
-    def image_random(self, timer=2):
+    def image_random(self, timer=0):
         if timer > 0:
             while True:
                 self.random_theme()

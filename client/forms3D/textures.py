@@ -29,6 +29,9 @@ class Texture():
         self.dir_eyes = "eyes"
         self.eyes = [
             "eye-1.jpg",
+            "eye-2.jpg",
+            "eye-3.jpg",
+            "eye-4.jpg",
         ] 
         self.eyes_id = []
         

@@ -16,12 +16,12 @@ from game import Game
 # globals:
 
 # Adresse IP et port sur lequel le serveur va écouter
-# BASH get ip: ip a | grep 'inet.*brd' | awk '{print $2}' | cut -f1 -d'/'
-serveur_ip = "127.0.0.1"
+serveur_ip = ""
 serveur_port = 12345
 
 # -----------------------------------------------------------------------------------------------
 
+# Recupération de l'adresse ip du server. equivaux à BASH get ip: ip a | grep 'inet.*brd' | awk '{print $2}' | cut -f1 -d'/'
 def get_ip_address():
     try:
         interfaces = ni.interfaces()
@@ -36,6 +36,16 @@ def get_ip_address():
         print("Error:", e)
         return None
 
+def broadcast(serveur_socket, game, data, serveur_ip, id_client):
+    for player in game.players:
+        if player.id != id_client:
+            serialized_msg = pickle.dumps(data)
+            serveur_socket.sendto(serialized_msg, (serveur_ip, player.id))
+
+def send_self(serveur_socket, serveur_ip, id_client, data):
+    serialized_msg = pickle.dumps(data)
+    serveur_socket.sendto(serialized_msg, (serveur_ip, id_client))
+
 def initUDPServer():
     serveur_ip = get_ip_address()
 
@@ -49,33 +59,34 @@ def initUDPServer():
     game = Game()
     
     while True:
-        message = None
+        data = None
         
         # Reception des données client
-        data, adress_client = serveur_socket.recvfrom(1024)
+        serial_data, adress_client = serveur_socket.recvfrom(1024)
         id_client = adress_client[1]
-        received_data = pickle.loads(data)  # Désérialiser les données binaires reçues
-        print(received_data)
+        received_data = pickle.loads(serial_data)  # Désérialiser les données binaires reçues
         
         pseudo = ""
         # Joueur entrant
         if "pseudo" in received_data:
+            # Envoi des données des autres joueurs pour initialisation
+            # data = game.init_levels()
+            # send_self(serveur_socket, serveur_ip, id_client, data)
+            data = game.init_players()
+            send_self(serveur_socket, serveur_ip, id_client, data)
+            
+            # Envoi de l'ajout du joueur aux autres joueurs
             pseudo = received_data["pseudo"]
-            message = game.add_player(id_client, pseudo)
-            print("nb players:", len(game.players))
+            data = game.add_player(id_client, pseudo)
+            broadcast(serveur_socket, game, data, serveur_ip, id_client)
         
         # Joueur sortant
         if "quit" in received_data:
-            pseudo = received_data["quit"]
-            message = game.sup_player(id_client, pseudo)
-            print("nb players:", len(game.players))
+            data = game.sup_player(id_client)
+            send_self(serveur_socket, serveur_ip, id_client, data)
         
         # Joueur joue
         if "play" in received_data:
-            message = game.update_player(id_client, received_data["play"])        
-        
-        # Envoi de la reponse au client
-        print("send message:", message)
-        if message:
-            serialized_msg = pickle.dumps(message)
-            serveur_socket.sendto(serialized_msg, adress_client)
+            data = game.update_player(id_client, received_data["play"]) 
+            broadcast(serveur_socket, game, data, serveur_ip, id_client)
+
