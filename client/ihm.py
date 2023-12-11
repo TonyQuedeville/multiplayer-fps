@@ -32,10 +32,14 @@ game = Game()
 def get_ihm_game():
     return game
 
-def send_sever(scene, serveur_port, serveur_ip, client_socket):
-    if scene == "quit":
+def send_sever(req, scene, serveur_port, serveur_ip, client_socket):
+    if req == "quit":
         data = {"quit" : "quit"}
-    else:
+    
+    elif req == "take_token":
+        data = {"take_token" : scene.token_id}
+    
+    elif req == "play":
         data = {
                 "play" : {
                     "player_nb_room" : scene.nb_room,
@@ -91,12 +95,12 @@ def initIHM(serveur_port, serveur_ip, client_socket, pseudo):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                send_sever("quit", serveur_port, serveur_ip, client_socket)
+                send_sever("quit", scene, serveur_port, serveur_ip, client_socket)
                 return False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
-                    send_sever("quit", serveur_port, serveur_ip, client_socket)
+                    send_sever("quit", scene, serveur_port, serveur_ip, client_socket)
                     return False
                 
                 elif event.key == pygame.K_LEFT:
@@ -134,24 +138,29 @@ def initIHM(serveur_port, serveur_ip, client_socket, pseudo):
                 glRotatef(angle/12, 0, 1, 0)
                 i_rot -=1            
                 scene.set_player_orientation(angle/12)
-                send_sever(scene, serveur_port, serveur_ip, client_socket)
+                send_sever("play", scene, serveur_port, serveur_ip, client_socket)
             else:
                 scene.set_player_position()
-                send_sever(scene, serveur_port, serveur_ip, client_socket)
+                send_sever("play", scene, serveur_port, serveur_ip, client_socket)
                 rotate_player = False
         
-        if avance != 0:
+        if avance != 0:            
             out_room, block = scene.move_test(avance)
             if not block:
                 scene.camera.move_camera(avance)                
                 scene.set_player_position()
-                send_sever(scene, serveur_port, serveur_ip, client_socket)
+                send_sever("play", scene, serveur_port, serveur_ip, client_socket)
+            
             elif out_room >= 0 and out_room != scene.nb_room: # Changement de salle
                 avance = 0
                 scene.set_room(out_room)
                 scene.random_theme()
                 scene.set_player_position()
-                send_sever(scene, serveur_port, serveur_ip, client_socket)
+                send_sever("play", scene, serveur_port, serveur_ip, client_socket)
+
+            token_id = scene.collision_test(game)
+            if not token_id is None:
+                send_sever("take_token", scene, serveur_port, serveur_ip, client_socket)
         
         scene.display_scene(game)
         

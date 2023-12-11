@@ -82,8 +82,12 @@ class Scene():
             "player_position" : self.player_position,
             "player_coord" : (self.player_x, self.player_y, self.player_z),
             "player_orientation" : self.player_orientation,
-            # "player_nb_medaillon": 0,
+            "player_nb_medaillon": 0,
         }
+        
+        self.radius_eyes = .1       # Rayon des yeux
+        self.radius_token = .05     # Rayon des médaillons
+        self.token_id = None        # Médaillon pris
         
         self.camera = Camera(position=(self.player_x, self.player_y, self.player_z))
         
@@ -139,13 +143,16 @@ class Scene():
             "player_position" : self.player_position,
             "player_coord" : (self.player_x, self.player_y, self.player_z),
             "player_orientation" : self.player_orientation,
-            # "player_nb_medaillon": 0,
+            "player_nb_medaillon": 0,
         }
     
     def set_player_orientation(self, angle):
         self.player_orientation += angle
         if self.player_orientation >= 360: self.player_orientation -= 360
         elif self.player_orientation < 0: self.player_orientation += 360
+    
+    def set_token_id(self, id):
+        self.token_id = id
     
     def move_test(self, avance):
         out_room = 0
@@ -238,8 +245,18 @@ class Scene():
         
         self.player_position = (int(self.player_x), 0, int(self.player_z+1))
         self.player_orientation = self.camera.rotate_angle
-        
         return out_room, block
+        
+        # Test collision médaillon
+    def collision_test(self, game):
+        self.set_token_id(None)
+        if game.tokens:
+            for token in game.tokens[self.nb_room]:
+                dif_x = abs(token[0]+.5 - self.player_x)
+                dif_z = abs(token[2]-.5 - self.player_z)
+                if dif_x <= self.radius_eyes + self.radius_token and dif_z <= self.radius_eyes + self.radius_token:
+                    self.set_token_id(token[3])        
+        return self.token_id
     
     def set_texture(self, texture):
         self.texture = texture # texture active
@@ -295,8 +312,8 @@ class Scene():
             "ml": lambda: cube(coord), # Block mur
             "bl": lambda: cube(coord), # Block image
             "ch": lambda: porte(coord, (.98, .01, .98), self.chiffre_rotate), # Chiffre au sol + plafond
-            "pl": lambda: sphere(coord, orientation, position, .10, 2), # Oeil de player
-            "md": lambda: cylindre((coord[0], -.1, coord[2]), position, .05, .01, self.med_rotate), # Medaillon
+            "pl": lambda: sphere(coord, orientation, position, self.radius_eyes, 2), # Oeil de player
+            "md": lambda: cylindre((coord[0], -.1, coord[2]), position, self.radius_token, .01, self.med_rotate), # Medaillon
             "rm": lambda: groom(coord, (.5, .5, 0), self.chiffre_rotate, self.nb_room), # Groom aux portes des rooms
         }
 

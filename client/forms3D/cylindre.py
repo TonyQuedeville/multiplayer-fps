@@ -25,21 +25,23 @@ def cylindre(position=(0, 0, 0), macoord=(0,0,0), radius=1, height=1, rotate_ang
         angle = i * step + rotate_angle  # Inclure l'angle de rotation
         
         rotated_x = x + radius * math.cos(angle + rotate_angle)  # Appliquer la rotation autour de l'axe
+        rotated_y = y 
         rotated_z = z + radius * math.sin(angle + rotate_angle)
-        vertices.append((rotated_x, y, rotated_z))
+        vertices.append((rotated_x, rotated_y, rotated_z))
         
         rotated_x_top = x + radius * math.cos(angle + rotate_angle)
+        rotated_y_top = y 
         rotated_z_top = z + radius * math.sin(angle + rotate_angle)
-        vertices.append((rotated_x_top, y + height, rotated_z_top))
+        vertices.append((rotated_x_top, rotated_y_top + height, rotated_z_top))
     
     # Dessiner les côtés du cylindre horizontal
     glBegin(GL_QUAD_STRIP)
     for i in range(len(vertices)):
         angle_ratio = i / sides
         glTexCoord2f(1.0 - angle_ratio, 0.0)
-        glVertex3f(vertices[i][0], y, vertices[i][2])
+        glVertex3f(vertices[i][0], rotated_y, vertices[i][2])
         glTexCoord2f(1.0 - angle_ratio, 1.0)
-        glVertex3f(vertices[i][0], y + height, vertices[i][2])
+        glVertex3f(vertices[i][0], rotated_y + height, vertices[i][2])
     glEnd()
 
     # Disque du dessus
@@ -48,7 +50,7 @@ def cylindre(position=(0, 0, 0), macoord=(0,0,0), radius=1, height=1, rotate_ang
     glVertex3f(x, y, z)  # Centre du cercle de la base inférieure
     for i in range(len(vertices)):
         glTexCoord2f(0.5 * math.cos(i * step) + 0.5, 0.5 * math.sin(i * step) + 0.5)
-        glVertex3f(vertices[i][0], y, vertices[i][2])  # Point sur le cercle de la base inférieure
+        glVertex3f(vertices[i][0], rotated_y, vertices[i][2])  # Point sur le cercle de la base inférieure
     glEnd()
 
     # Disque du dessous
@@ -57,5 +59,5 @@ def cylindre(position=(0, 0, 0), macoord=(0,0,0), radius=1, height=1, rotate_ang
     glVertex3f(x, y + height, z)  # Centre du cercle de la base supérieure
     for i in range(len(vertices)):
         glTexCoord2f(0.5 * math.cos(i * step) + 0.5, 0.5 * math.sin(i * step) + 0.5)
-        glVertex3f(vertices[i][0], y + height, vertices[i][2])  # Point sur le cercle de la base supérieure
+        glVertex3f(vertices[i][0], rotated_y + height, vertices[i][2])  # Point sur le cercle de la base supérieure
     glEnd()
