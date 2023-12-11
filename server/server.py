@@ -40,7 +40,7 @@ def broadcast(serveur_socket, game, data, serveur_ip, id_client):
     for player in game.players:
         if player.id != id_client:
             serialized_msg = pickle.dumps(data)
-            serveur_socket.sendto(serialized_msg, (serveur_ip, player.id))
+            serveur_socket.sendto(serialized_msg, (serveur_ip, player.id_client))
 
 def send_self(serveur_socket, serveur_ip, id_client, data):
     serialized_msg = pickle.dumps(data)
@@ -62,23 +62,21 @@ def initUDPServer():
         data = None
         
         # Reception des données client
-        serial_data, adress_client = serveur_socket.recvfrom(1024)
+        serial_data, adress_client = serveur_socket.recvfrom(2048)
         id_client = adress_client[1]
         received_data = pickle.loads(serial_data)  # Désérialiser les données binaires reçues
         
         pseudo = ""
         # Joueur entrant
-        if "pseudo" in received_data:
-            # Envoi des données des autres joueurs pour initialisation
-            # data = game.init_levels()
-            # send_self(serveur_socket, serveur_ip, id_client, data)
-            data = game.init_players()
-            send_self(serveur_socket, serveur_ip, id_client, data)
-            
+        if "pseudo" in received_data:            
             # Envoi de l'ajout du joueur aux autres joueurs
             pseudo = received_data["pseudo"]
             data = game.add_player(id_client, pseudo)
-            broadcast(serveur_socket, game, data, serveur_ip, id_client)
+            broadcast(serveur_socket, game, data, serveur_ip, id_client) 
+            
+            # Envoi des données des autres joueurs pour initialisation
+            data = game.init_game(data["addPlayer"]["id"])
+            send_self(serveur_socket, serveur_ip, id_client, data)
         
         # Joueur sortant
         if "quit" in received_data:
@@ -87,6 +85,6 @@ def initUDPServer():
         
         # Joueur joue
         if "play" in received_data:
-            data = game.update_player(id_client, received_data["play"]) 
+            data = game.update_player(id_client, received_data["play"])
             broadcast(serveur_socket, game, data, serveur_ip, id_client)
 

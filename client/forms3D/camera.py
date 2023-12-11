@@ -13,7 +13,7 @@ import numpy as np
 # -----------------------------------------------------------------------------------------------
 
 class Camera():
-    def __init__(self, position=[1, 0, 1], lookAt=[0, 0, -1], up=[0, 1, 0], speed=0.1):
+    def __init__(self, position=[1, 0, 1], lookAt=[0, 0, -1], up=[0, 1, 0], speed=0.1, fov=60):
         self.position = position
         self.move = [0, 0, 0]   # Progression de déplacement
         self.lookAt = lookAt    # Point de regard de la camera en degré
@@ -23,6 +23,7 @@ class Camera():
         self.rotate_angle = 90  # Direction de la camera : Angle de rotation en degré
         self.angle = 0          # Angle actuel de rotation en degré
         self.rotate_speed = 12  # Vitesse de rotation
+        self.fov = fov          # Angle de vue
 
     def move_camera(self, avance=0):
         x,y,z = self.position

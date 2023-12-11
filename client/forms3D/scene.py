@@ -250,7 +250,7 @@ class Scene():
     def set_med_rotate_axis(self, axis):
         self.med_rotate_axis = axis
 
-    def display_scene(self, players):
+    def display_scene(self, game):
         # Formes en fonction de la salle
         value_change = ""
         for y, lig in enumerate(self.room):
@@ -262,7 +262,7 @@ class Scene():
                         
                         if prefixe_form == "sl" or prefixe_form == "sp" or prefixe_form == "ml" or prefixe_form == "cl":
                             self.texture.apply_sols(nb)                            
-                        elif prefixe_form == "bl" or prefixe_form == "md":
+                        elif prefixe_form == "bl":
                             self.texture.apply_theme(nb)
                         elif prefixe_form == "ch":
                             self.texture.apply_chiffre(nb)
@@ -271,25 +271,32 @@ class Scene():
                             self.texture.apply_groom(nb)
                             self.chiffre_rotate = chiffre_orientation.get(nb)
                 
-                self.forms(prefixe_form, (x-self.player_x, -0.5, y-self.player_z), self.player_position)
+                self.forms(prefixe_form, (x-self.player_x, -0.5, y-self.player_z), self.player_orientation, self.player_position)
                 value_change = value 
         
-        if players.players:
-            for player in players.players:
-                eye = 2
-                if player.pseudo == "toto":
-                    eye = 0
-                self.texture.apply_eyes(eye)
-                self.forms("pl", player.player_coord, (self.player_x, -0.5, self.player_z))
+        # Médaillons
+        if game.tokens:
+            for token in game.tokens[self.nb_room]:
+                # print("token:", token)
+                if token:
+                    self.texture.apply_chiffre(self.nb_room)
+                    self.forms("md", token, 0, (self.player_x, -0.5, self.player_z))
+        
+        # Joueurs
+        if game.players:
+            for player in game.players:
+                if player.id != game.id:
+                    self.texture.apply_eyes(player.id)
+                    self.forms("pl", player.player_coord, player.player_orientation, (self.player_x, -0.5, self.player_z))
 
-    def forms(self, prefixe_form, coord, position):
+    def forms(self, prefixe_form, coord, orientation=90, position=(0,0,0)):
         switcher = {
             "sl": lambda: couloir(coord), # Sol + plafond
             "ml": lambda: cube(coord), # Block mur
             "bl": lambda: cube(coord), # Block image
             "ch": lambda: porte(coord, (.98, .01, .98), self.chiffre_rotate), # Chiffre au sol + plafond
-            "pl": lambda: sphere(coord, position, .10, 2), # Oeil de player
-            "md": lambda: cylindre((coord[0], -.1, coord[2]), .05, .01, self.med_rotate), # Medaillon
+            "pl": lambda: sphere(coord, orientation, position, .10, 2), # Oeil de player
+            "md": lambda: cylindre((coord[0], -.1, coord[2]), position, .05, .01, self.med_rotate), # Medaillon
             "rm": lambda: groom(coord, (.5, .5, 0), self.chiffre_rotate, self.nb_room), # Groom aux portes des rooms
         }
 

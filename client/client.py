@@ -11,12 +11,12 @@
 import socket, threading, pickle
 import netifaces as ni
 from ihm import initIHM
-from ihm import get_ihm_players
+from ihm import get_ihm_game
 
 # -----------------------------------------------------------------------------------------------
 # globals:
 # Adresse IP et port du serveur
-serveur_ip = "192.168.1.52" #"192.168.100.151" #"172.16.0.230" # #"127.0.0.1"
+serveur_ip = "192.168.100.151" #"172.16.0.230" # #"127.0.0.1"
 serveur_port = 12345
 
 # Création d'une socket UDP
@@ -59,29 +59,37 @@ def new_player():
 def listen_server():
     client_socket.settimeout(.5)
     
-    players = get_ihm_players()
+    game = get_ihm_game()
     while not stop_event.is_set(): # Ecoute serveur
         try:
-            data, adress_server = client_socket.recvfrom(1024)
+            data, adress_server = client_socket.recvfrom(2048)
             # id_client = adress_server[1]
-            received_data = pickle.loads(data)
+            received_data = pickle.loads(data) # déserialise les données
             
-            pseudo = ""
-            # Joueur entrant
-            if "addPlayer" in received_data:
-                players.add_player(received_data["addPlayer"])
-            
-            # Joueur sortant
-            if "supPlayer" in received_data:
-                players.sup_player(received_data["supPlayer"])
-            
-            # Joueur joue
-            if "player" in received_data:
-                players.update_player(received_data["player"]) 
-            
-            # Initialisation joueurs
-            if "init_players" in received_data:
-                players.init_players(received_data["init_players"]) 
+            if received_data:
+                # Joueur entrant
+                if "addPlayer" in received_data:
+                    game.add_player(received_data["addPlayer"])
+                
+                # Joueur sortant
+                if "supPlayer" in received_data:
+                    game.sup_player(received_data["supPlayer"])
+                
+                # Joueur joue
+                if "play" in received_data:
+                    game.update_player(received_data["play"]) 
+                
+                # Initialisation de l'id du joueur
+                if "my_id" in received_data:
+                    game.set_id(received_data["my_id"])
+                    
+                # Initialisation des joueurs
+                if "init_players" in received_data:
+                    game.init_players(received_data["init_players"])
+                
+                # Initialisation des médaillons
+                if "init_tokens" in received_data:
+                    game.init_tokens(received_data["init_tokens"])
             
         except socket.timeout:
             pass

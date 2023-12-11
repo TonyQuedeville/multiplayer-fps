@@ -8,7 +8,7 @@
 
 # -----------------------------------------------------------------------------------------------
 #  imports:
-import numpy as np
+# import numpy as np
 import pygame
 import time
 import pickle
@@ -20,17 +20,17 @@ from OpenGL.GLU import gluPerspective, gluLookAt
 # import pyBullet # simulation physique
 
 from forms3D.scene import Scene
-from players import Players
+from game import Game
 
 # -----------------------------------------------------------------------------------------------
 #  Globals
-players = Players()
+game = Game()
 
 # -----------------------------------------------------------------------------------------------
 # Pygame : interface de jeu
 
-def get_ihm_players():
-    return players
+def get_ihm_game():
+    return game
 
 def send_sever(scene, serveur_port, serveur_ip, client_socket):
     if scene == "quit":
@@ -52,8 +52,8 @@ def send_sever(scene, serveur_port, serveur_ip, client_socket):
 def initIHM(serveur_port, serveur_ip, client_socket, pseudo):
     # Fenêtre pygame
     pygame.init()
-    largeur, hauteur = 800, 600
-    flags = DOUBLEBUF|OPENGL  # Mode 1200x600
+    largeur, hauteur = 900, 600
+    flags = DOUBLEBUF|OPENGL  # Mode 900x600 pour les tests
     # flags = pygame.FULLSCREEN | pygame.DOUBLEBUF | OPENGL | pygame.HWSURFACE # Mode plein écran
     # Créez la fenêtre Pygame
     fenetre_pygame = pygame.display.set_mode((largeur, hauteur), flags)
@@ -73,7 +73,7 @@ def initIHM(serveur_port, serveur_ip, client_socket, pseudo):
     last_time = time.time() # Timer pour l'appuis constant sur avance
 
     # Fenêtre pyOpenGL
-    gluPerspective(30, (largeur/hauteur), 0.1, 50.0)
+    gluPerspective(scene.camera.fov, (largeur/hauteur), 0.1, 50.0)
     glEnable(GL_DEPTH_TEST)
     glEnable(GL_NORMALIZE)
     glEnable(GL_COLOR_MATERIAL)
@@ -153,7 +153,7 @@ def initIHM(serveur_port, serveur_ip, client_socket, pseudo):
                 scene.set_player_position()
                 send_sever(scene, serveur_port, serveur_ip, client_socket)
         
-        scene.display_scene(players)
+        scene.display_scene(game)
         
         pygame.display.flip()
-        clock.tick(10)  # Limitez le framerate à 50 FPS
+        clock.tick(30)  # Limitez le framerate à 50 FPS
