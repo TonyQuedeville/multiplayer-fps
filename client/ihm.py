@@ -57,8 +57,8 @@ def initIHM(serveur_port, serveur_ip, client_socket, pseudo):
     # Fenêtre pygame
     pygame.init()
     largeur, hauteur = 900, 600
-    flags = DOUBLEBUF|OPENGL  # Mode 900x600 pour les tests
-    # flags = pygame.FULLSCREEN | pygame.DOUBLEBUF | OPENGL | pygame.HWSURFACE # Mode plein écran
+    # flags = DOUBLEBUF|OPENGL  # Mode 900x600 pour les tests
+    flags = pygame.FULLSCREEN | pygame.DOUBLEBUF | OPENGL | pygame.HWSURFACE # Mode plein écran
     # Créez la fenêtre Pygame
     fenetre_pygame = pygame.display.set_mode((largeur, hauteur), flags)
     pygame.display.set_caption("Tony Quedeville 27/11/2024. Projet Zone01 : multi players fps.                           player : " + str(pseudo))
@@ -76,6 +76,9 @@ def initIHM(serveur_port, serveur_ip, client_socket, pseudo):
     # Timers de synchronisation
     clock = pygame.time.Clock() # Timer pour la vitesse de rafraîchissement
     last_time = time.time() # Timer pour l'appuis constant sur avance
+    fps_counter = 0 # Compteur d'image
+    fps_timer = time.time() # Timer pour la mesure fps
+    fps = 0
 
     # Fenêtre pyOpenGL
     gluPerspective(scene.camera.fov, (largeur/hauteur), 0.1, 50.0)
@@ -163,7 +166,15 @@ def initIHM(serveur_port, serveur_ip, client_socket, pseudo):
             if not token_id is None:
                 send_sever("take_token", scene, serveur_port, serveur_ip, client_socket)
         
-        scene.display_scene(game)
+        # Calculer FPS
+        fps_counter += 1
+        if time.time() - fps_timer > 1:  # Vérifier toutes les secondes
+            fps = round(fps_counter / (time.time() - fps_timer))
+            # print(f"FPS: {fps}")
+            fps_counter = 0
+            fps_timer = time.time()
         
+        scene.display_scene(game, fps)
         pygame.display.flip()
+        
         clock.tick(50)  # Limitez le framerate à 50 FPS

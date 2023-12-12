@@ -268,7 +268,7 @@ class Scene():
     def set_med_rotate_axis(self, axis):
         self.med_rotate_axis = axis
 
-    def display_scene(self, game):
+    def display_scene(self, game, fps):
         # Formes en fonction de la salle
         value_change = ""
         for y, lig in enumerate(self.room):
@@ -308,7 +308,8 @@ class Scene():
         
         # Score Board
         self.texture.apply_sols(1)
-        texte3D("Jeton : " + str(self.player_nb_medaillon) + " ", self.player_orientation) # nombre de medaillon
+        texte3D("Jeton : " + str(self.player_nb_medaillon) + " ", (-.075, .05, -.1), self.player_orientation) # nombre de medaillon
+        texte3D(" fps : " + str(fps), (.06, .05, -.1), self.player_orientation) # fps
 
     def forms(self, prefixe_form, coord):
         switcher = {

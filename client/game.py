@@ -63,7 +63,7 @@ class Game():
     def update_player(self, data):
         player = self.get_player_by_id(data["id"])
         if player:
-            player.nb_room = data["player_nb_room"]
+            player.player_nb_room = data["player_nb_room"]
             player.player_position = data["player_position"]
             player.player_coord = data["player_coord"]
             player.player_orientation = data["player_orientation"]

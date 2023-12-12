@@ -16,7 +16,7 @@ from ihm import get_ihm_game
 # -----------------------------------------------------------------------------------------------
 # globals:
 # Adresse IP et port du serveur
-serveur_ip = "192.168.100.151" #"172.16.0.230" # #"127.0.0.1"
+serveur_ip = "192.168.1.46" #"192.168.100.151" #"172.16.0.230" # #"127.0.0.1"
 serveur_port = 12345
 
 # Création d'une socket UDP

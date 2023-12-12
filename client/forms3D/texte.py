@@ -16,9 +16,9 @@ from OpenGL.GL import *
 
 # -----------------------------------------------------------------------------------------------
 
-def texte3D(text, orientation):
-    font = pygame.font.Font("board2D/police/explore.ttf", 24)  # Sélectionnez la police et la taille souhaitées
-    x,y,z = (-.075, .05, -.1)
+def texte3D(text, coord=(-.075, .05, -.1), orientation=90):
+    font = pygame.font.Font("board2D/police/explore.ttf", 20)  # Sélectionnez la police et la taille souhaitées
+    x,y,z = coord
 
     text_surface = font.render(text, False, (255, 255, 255))  # Couleur du texte: blanc
     text_surface.set_colorkey((0, 0, 0))  # Définir la couleur noire comme transparente
