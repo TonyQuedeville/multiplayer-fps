@@ -65,7 +65,7 @@ def initUDPServer():
         serial_data, adress_client = serveur_socket.recvfrom(2048)
         ip_client = adress_client[0]
         id_client = adress_client[1]
-        print("adress_client", adress_client)
+        # print("adress_client", adress_client)
         received_data = pickle.loads(serial_data)  # Désérialiser les données binaires reçues
         
         pseudo = ""

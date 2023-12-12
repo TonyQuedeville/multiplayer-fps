@@ -302,7 +302,7 @@ class Scene():
         # Joueurs
         if game.players:
             for player in game.players:
-                if player.id != game.id:
+                if player.id != game.id and player.player_nb_room == self.nb_room:
                     self.texture.apply_eyes(player.id)
                     sphere(player.id, player.player_coord, player.player_orientation, (self.player_x, -0.5, self.player_z), self.radius_eyes, 2), # Oeil de player
         
