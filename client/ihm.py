@@ -65,6 +65,7 @@ def initIHM(serveur_port, serveur_ip, client_socket, pseudo):
     
     # Initialisation Room 0
     scene = Scene(0)
+    game.set_scene(scene)
 
     avance = 0 # Valeur d'avance (recul si < 0)
 
@@ -165,4 +166,4 @@ def initIHM(serveur_port, serveur_ip, client_socket, pseudo):
         scene.display_scene(game)
         
         pygame.display.flip()
-        clock.tick(30)  # Limitez le framerate à 50 FPS
+        clock.tick(50)  # Limitez le framerate à 50 FPS

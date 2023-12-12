@@ -15,15 +15,21 @@ class Game():
     def __init__(self, players=[], tokens=[]):
         # Moi
         self.id = None
-        # Joueurs
+        self.id_client = None
+        self.scene = None
+        
+        # Les autres joueurs
         self.players = players
-        self.nb_players = len(self.players)
+        
         # Médaillons
         self.tokens = tokens
     
     # Setter
-    def set_id(self, id):
-        self.id = id
+    def set_me(self, data):
+        self.id = data["my_id"]
+    
+    def set_scene(self, scene):
+        self.scene = scene
     
     # Joueurs
     def init_players(self, players):
@@ -42,8 +48,12 @@ class Game():
         player.player_position = data["player_position"]
         player.player_coord = data["player_coord"]
         player.player_orientation = data["player_orientation"]
-        # player.player_nb_medaillon = data["player_nb_medaillon"]
+        player.player_nb_medaillon = data["player_nb_medaillon"]
         self.players.append(player)
+    
+    def confirm_player(self, data):
+        self.id = data["id"]
+        self.id_client = data["id_client"]
     
     def sup_player(self, id):
         player = self.get_player_by_id(id)
@@ -57,11 +67,11 @@ class Game():
             player.player_position = data["player_position"]
             player.player_coord = data["player_coord"]
             player.player_orientation = data["player_orientation"]
-            # player.player_nb_medaillon = data["player_nb_medaillon"]
+            player.player_nb_medaillon = data["player_nb_medaillon"]
     
     # Medaillons
-    def init_tokens(self, tokens):
-        self.tokens = tokens
+    def init_tokens(self, data):
+        self.tokens = data["init_tokens"]
     
     def get_token_by_id(self, id):
         for token in self.tokens:

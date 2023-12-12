@@ -16,13 +16,20 @@ from OpenGL.GL import *
 
 # -----------------------------------------------------------------------------------------------
 
-def texte3D(text, x, y, z):
+def texte3D(text, orientation):
     font = pygame.font.Font("board2D/police/explore.ttf", 24)  # Sélectionnez la police et la taille souhaitées
+    x,y,z = (-.075, .05, -.1)
+
     text_surface = font.render(text, False, (255, 255, 255))  # Couleur du texte: blanc
     text_surface.set_colorkey((0, 0, 0))  # Définir la couleur noire comme transparente
     text_data = pygame.image.tostring(text_surface, "RGBA", True)
+    
 
     glPushMatrix()
+    glRotatef((orientation-90)*-1, 0, 1, 0)
     glRasterPos3f(x, y, z)
+    glEnable( GL_BLEND )
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA )
     glDrawPixels(text_surface.get_width(), text_surface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, text_data)
     glPopMatrix()
+    

@@ -21,17 +21,13 @@ from OpenGL.GLU import *
 
 # -----------------------------------------------------------------------------------------------
 
-def sphere(coord=(0, 0, 0), orientation=90, macoord=(0,0,0), radius=0.25, tremblote=0, slices=30, stacks=30, lines=False):       
+def sphere(id, coord=(0, 0, 0), orientation=90, macoord=(0,0,0), radius=0.25, tremblote=0, slices=30, stacks=30, lines=False):       
     sphere_surface = gluNewQuadric()
     gluQuadricTexture(sphere_surface, GL_TRUE)
 
     glPushMatrix()
     glTranslatef(coord[0]-macoord[0], coord[1], coord[2]-macoord[2])
-    
-    # glRotatef(50+random.randint(-tremblote, tremblote), 1, 0, 0)
-    # glRotatef(5+random.randint(-tremblote, tremblote) + orientation-90, 0, 1, 0)
-    # glRotatef(-30+random.randint(-tremblote, tremblote), 0, 0, 1)
-    
+
     glRotatef(random.randint(-tremblote, tremblote) - 90, 1, 0, 0)
     glRotatef(random.randint(-tremblote, tremblote), 0, 1, 0)
     glRotatef(random.randint(-tremblote, tremblote) - orientation - 90, 0, 0, 1)

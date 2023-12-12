@@ -68,7 +68,7 @@ def initUDPServer():
         
         pseudo = ""
         # Joueur entrant
-        if "pseudo" in received_data:            
+        if "pseudo" in received_data:
             # Envoi de l'ajout du joueur aux autres joueurs
             pseudo = received_data["pseudo"]
             data = game.add_player(id_client, pseudo)
@@ -87,9 +87,10 @@ def initUDPServer():
         if "play" in received_data:
             data = game.update_player(id_client, received_data["play"])
             broadcast(serveur_socket, game, data, serveur_ip, id_client)
-            
+        
         # Joueur prend un médaillon
         if "take_token" in received_data:
             data = game.update_tokens(id_client, received_data["take_token"])
             broadcast(serveur_socket, game, data, serveur_ip, None)
+            send_self(serveur_socket, serveur_ip, id_client, data)
 

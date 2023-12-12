@@ -22,6 +22,7 @@ class Texture():
         self.dir_sols = "textures"
         self.sols = [
             "ardoise.jpg",
+            "fond-blanc.png",
         ]
         self.sols_id = []
         

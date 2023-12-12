@@ -64,12 +64,15 @@ def listen_server():
         try:
             data, adress_server = client_socket.recvfrom(2048)
             # id_client = adress_server[1]
+            # print("id_client:", id_client)
             received_data = pickle.loads(data) # déserialise les données
             
             if received_data:
                 # Joueur entrant
                 if "addPlayer" in received_data:
                     game.add_player(received_data["addPlayer"])
+                if "confirmPlayer" in received_data:
+                    game.confirm_player(received_data["confirmPlayer"])
                 
                 # Joueur sortant
                 if "supPlayer" in received_data:
@@ -81,7 +84,7 @@ def listen_server():
                 
                 # Initialisation de l'id du joueur
                 if "my_id" in received_data:
-                    game.set_id(received_data["my_id"])
+                    game.set_me(received_data)
                     
                 # Initialisation des joueurs
                 if "init_players" in received_data:
@@ -89,7 +92,7 @@ def listen_server():
                 
                 # Initialisation des médaillons
                 if "init_tokens" in received_data:
-                    game.init_tokens(received_data["init_tokens"])
+                    game.init_tokens(received_data)
             
         except socket.timeout:
             pass

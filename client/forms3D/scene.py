@@ -72,11 +72,12 @@ class Scene():
         self.room = level[0] # Salle d'exposition
         self.size_room = (len(self.room[0]), len(self.room))
         
-        self.player_position = level[1] # Position initial du joueur
+        self.player_position = level[1]                 # Position initial du joueur
         self.player_x = self.player_position[0] + .5
         self.player_y = self.player_position[1] 
         self.player_z = self.player_position[2] - .5
-        self.player_orientation = level[2] # Orientation initial du joueur
+        self.player_orientation = level[2]              # Orientation initial du joueur
+        self.player_nb_medaillon = 0                    # Nombre de médaillons
         self.player = {
             "player_nb_room" : self.nb_room,
             "player_position" : self.player_position,
@@ -143,7 +144,7 @@ class Scene():
             "player_position" : self.player_position,
             "player_coord" : (self.player_x, self.player_y, self.player_z),
             "player_orientation" : self.player_orientation,
-            "player_nb_medaillon": 0,
+            "player_nb_medaillon": self.player_nb_medaillon,
         }
     
     def set_player_orientation(self, angle):
@@ -247,7 +248,7 @@ class Scene():
         self.player_orientation = self.camera.rotate_angle
         return out_room, block
         
-        # Test collision médaillon
+    # Test collision médaillon
     def collision_test(self, game):
         self.set_token_id(None)
         if game.tokens:
@@ -255,7 +256,8 @@ class Scene():
                 dif_x = abs(token[0]+.5 - self.player_x)
                 dif_z = abs(token[2]-.5 - self.player_z)
                 if dif_x <= self.radius_eyes + self.radius_token and dif_z <= self.radius_eyes + self.radius_token:
-                    self.set_token_id(token[3])        
+                    self.set_token_id(token[3])
+                    self.player_nb_medaillon +=1
         return self.token_id
     
     def set_texture(self, texture):
@@ -288,32 +290,33 @@ class Scene():
                             self.texture.apply_groom(nb)
                             self.chiffre_rotate = chiffre_orientation.get(nb)
                 
-                self.forms(prefixe_form, (x-self.player_x, -0.5, y-self.player_z), self.player_orientation, self.player_position)
+                self.forms(prefixe_form, (x-self.player_x, -0.5, y-self.player_z))
                 value_change = value 
         
         # Médaillons
         if game.tokens:
             for token in game.tokens[self.nb_room]:
-                # print("token:", token)
                 if token:
                     self.texture.apply_chiffre(self.nb_room)
-                    self.forms("md", token, 0, (self.player_x, -0.5, self.player_z))
+                    cylindre((token[0], -.1, token[2]), (self.player_x, -0.5, self.player_z), self.radius_token, .01, self.med_rotate)
         
         # Joueurs
         if game.players:
             for player in game.players:
                 if player.id != game.id:
                     self.texture.apply_eyes(player.id)
-                    self.forms("pl", player.player_coord, player.player_orientation, (self.player_x, -0.5, self.player_z))
+                    sphere(player.id, player.player_coord, player.player_orientation, (self.player_x, -0.5, self.player_z), self.radius_eyes, 2), # Oeil de player
+        
+        # Score Board
+        self.texture.apply_sols(1)
+        texte3D("Jeton : " + str(self.player_nb_medaillon) + " ", self.player_orientation) # nombre de medaillon
 
-    def forms(self, prefixe_form, coord, orientation=90, position=(0,0,0)):
+    def forms(self, prefixe_form, coord):
         switcher = {
             "sl": lambda: couloir(coord), # Sol + plafond
             "ml": lambda: cube(coord), # Block mur
             "bl": lambda: cube(coord), # Block image
             "ch": lambda: porte(coord, (.98, .01, .98), self.chiffre_rotate), # Chiffre au sol + plafond
-            "pl": lambda: sphere(coord, orientation, position, self.radius_eyes, 2), # Oeil de player
-            "md": lambda: cylindre((coord[0], -.1, coord[2]), position, self.radius_token, .01, self.med_rotate), # Medaillon
             "rm": lambda: groom(coord, (.5, .5, 0), self.chiffre_rotate, self.nb_room), # Groom aux portes des rooms
         }
 

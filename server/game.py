@@ -14,14 +14,15 @@ from player import Player
 # -----------------------------------------------------------------------------------------------
 
 class Game():
-    def __init__(self, players=[], tokens=[]):
+    def __init__(self, players=[]):
         # Joueurs
         self.players = players
         self.nb_players = len(self.players)
+        
         # Médaillons
         self.tokens = [
-            [[3,0,3]], # Level0
-            [[9,0,11],[11,0,4],[9,0,9],[6,0,10],[3,0,9],[2,0,8],[8,0,4]], # Level1
+            [[3, 0, 3]], # Level0
+            [[9,0,11],[11,0,4],[9,0,9],[6,0,10],[7,0,11],[3,0,9],[2,0,8],[8,0,4]], # Level1
             [[1,0,1],[11,0,9],[12,0,10],[11,0,7],[10,0,10],[5,0,9],[5,0,7],[11,0,3],[12,0,5]], # Level2
             [[2,0,1],[9,0,1],[14,0,1],[7,0,11],[12,0,9],[14,0,13],[14,0,5]], # Level3
             [[5,0,5],[2,0,13],[7,0,8],[9,0,2],[8,0,3],[13,0,6],[14,0,1],[14,0,8],[14,0,11], [14,0,13]], # Level4
@@ -85,6 +86,14 @@ class Game():
                     }
                 }
     
+    def confirm_player(self, id_client, pseudo):
+        player = Player(len(self.players), id_client, pseudo)
+        return {"confirmPlayer" : {
+                        "id": player.id,
+                        "id_client": player.id_client,
+                    }
+                }
+    
     def sup_player(self, id_client):
         player = self.get_player_by_id_client(id_client)
         if player:
@@ -130,6 +139,10 @@ class Game():
         if player:
             if self.sup_token(data):
                 player.player_nb_medaillon += 1            
-            return {"init_tokens" : self.tokens}
+            return {
+                    "init_tokens" : self.tokens,
+                    "player_id_client" : player.id_client,
+                    "player_nb_medaillon" : player.player_nb_medaillon,
+                    }
         else:
             return None

@@ -17,6 +17,6 @@ class Player():
         self.player_position = position         # Position matricielle initiale level 0 (int)
         self.player_coord = coord               # Coordonnée initiale level 0 (float)
         self.player_orientation = orientation   # Orientation initiale level 0
-        # self.player_nb_medaillon = 0          # Nombre de médaillons
-        
+        self.player_nb_medaillon = 0          # Nombre de médaillons
+
 # ------------------------------------------------------------------------------------------------------------------------
