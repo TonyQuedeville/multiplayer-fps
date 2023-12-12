@@ -9,9 +9,10 @@
 # -----------------------------------------------------------------------------------------------
 
 class Player():
-    def __init__(self, id, id_client, pseudo=""):
+    def __init__(self, id, ip_client, id_client, pseudo=""):
         self.id = id                        # Numero du joueur
-        self.id_client = id_client          # Numero client
+        self.ip_client = ip_client          # ip client
+        self.id_client = id_client          # port client
         self.pseudo = pseudo                # Pseudo du joueur
         self.player_nb_room = 0             # numero de salle dans laquelle le joueur se trouve
         self.player_position = [4, 0, 4]    # Position matricielle initiale level 0 (int)

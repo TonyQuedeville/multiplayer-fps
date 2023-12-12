@@ -71,7 +71,7 @@ class Scene():
         level = levels.get(nb_room) # Niveau
         self.room = level[0] # Salle d'exposition
         self.size_room = (len(self.room[0]), len(self.room))
-        
+
         self.player_position = level[1]                 # Position initial du joueur
         self.player_x = self.player_position[0] + .5
         self.player_y = self.player_position[1] 
@@ -257,7 +257,6 @@ class Scene():
                 dif_z = abs(token[2]-.5 - self.player_z)
                 if dif_x <= self.radius_eyes + self.radius_token and dif_z <= self.radius_eyes + self.radius_token:
                     self.set_token_id(token[3])
-                    self.player_nb_medaillon +=1
         return self.token_id
     
     def set_texture(self, texture):

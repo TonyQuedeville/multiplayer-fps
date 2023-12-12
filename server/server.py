@@ -36,15 +36,15 @@ def get_ip_address():
         print("Error:", e)
         return None
 
-def broadcast(serveur_socket, game, data, serveur_ip, id_client):
+def broadcast(serveur_socket, game, data, id_client):
     for player in game.players:
         if player.id != id_client:
             serialized_msg = pickle.dumps(data)
-            serveur_socket.sendto(serialized_msg, (serveur_ip, player.id_client))
+            serveur_socket.sendto(serialized_msg, (player.ip_client, player.id_client))
 
-def send_self(serveur_socket, serveur_ip, id_client, data):
+def send_self(serveur_socket, ip_client, id_client, data):
     serialized_msg = pickle.dumps(data)
-    serveur_socket.sendto(serialized_msg, (serveur_ip, id_client))
+    serveur_socket.sendto(serialized_msg, (ip_client, id_client))
 
 def initUDPServer():
     serveur_ip = get_ip_address()
@@ -63,7 +63,9 @@ def initUDPServer():
         
         # Reception des données client
         serial_data, adress_client = serveur_socket.recvfrom(2048)
+        ip_client = adress_client[0]
         id_client = adress_client[1]
+        print("adress_client", adress_client)
         received_data = pickle.loads(serial_data)  # Désérialiser les données binaires reçues
         
         pseudo = ""
@@ -71,26 +73,29 @@ def initUDPServer():
         if "pseudo" in received_data:
             # Envoi de l'ajout du joueur aux autres joueurs
             pseudo = received_data["pseudo"]
-            data = game.add_player(id_client, pseudo)
-            broadcast(serveur_socket, game, data, serveur_ip, id_client) 
+            print("pseudo:", pseudo)
+            data = game.add_player(ip_client, id_client, pseudo)
+            broadcast(serveur_socket, game, data, id_client) 
             
             # Envoi des données des autres joueurs pour initialisation
             data = game.init_game(data["addPlayer"]["id"])
-            send_self(serveur_socket, serveur_ip, id_client, data)
+            send_self(serveur_socket, ip_client, id_client, data)
         
         # Joueur sortant
         if "quit" in received_data:
             data = game.sup_player(id_client)
-            send_self(serveur_socket, serveur_ip, id_client, data)
+            send_self(serveur_socket, ip_client, id_client, data)
         
         # Joueur joue
         if "play" in received_data:
             data = game.update_player(id_client, received_data["play"])
-            broadcast(serveur_socket, game, data, serveur_ip, id_client)
+            broadcast(serveur_socket, game, data, id_client)
         
         # Joueur prend un médaillon
         if "take_token" in received_data:
             data = game.update_tokens(id_client, received_data["take_token"])
-            broadcast(serveur_socket, game, data, serveur_ip, None)
-            send_self(serveur_socket, serveur_ip, id_client, data)
+            broadcast(serveur_socket, game, data, None) # supprime la piece dans le niveau
+            
+            data = game.change_score(id_client)
+            send_self(serveur_socket, ip_client, id_client, data) # rajoute toi un point
 

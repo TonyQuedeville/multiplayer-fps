@@ -79,6 +79,9 @@ class Game():
                 return token
         return None
     
+    def change_score(self, player_nb_medaillon):
+        self.scene.player_nb_medaillon = player_nb_medaillon
+    
     def sup_token(self, id):
         token = self.get_token_by_id(id)
         if token:

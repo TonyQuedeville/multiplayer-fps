@@ -71,8 +71,8 @@ class Game():
                 return player
         return None
     
-    def add_player(self, id_client, pseudo):
-        player = Player(len(self.players), id_client, pseudo)
+    def add_player(self, ip_client, id_client, pseudo):
+        player = Player(len(self.players), ip_client, id_client, pseudo)
         self.players.append(player)
         return {"addPlayer" : {
                         "id": player.id,
@@ -138,11 +138,14 @@ class Game():
         player = self.get_player_by_id(id)
         if player:
             if self.sup_token(data):
-                player.player_nb_medaillon += 1            
-            return {
-                    "init_tokens" : self.tokens,
-                    "player_id_client" : player.id_client,
-                    "player_nb_medaillon" : player.player_nb_medaillon,
-                    }
+                player.player_nb_medaillon += 1
+            return {"init_tokens" : self.tokens,}
+        else:
+            return None
+    
+    def change_score(self, id):
+        player = self.get_player_by_id(id)
+        if player:
+            return {"change_score" : player.player_nb_medaillon}
         else:
             return None
