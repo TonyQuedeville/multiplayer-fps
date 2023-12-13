@@ -19,7 +19,16 @@ def couloir(position=(0,0,0), size=(.99, 0.01, .99)):
     plane(position, size)
     plane((position[0], position[1] + 1, position[2]), size)
 
-def plane(position=(0,0,0), size=(.99, 0.01, .99), lines=False):
+def minimap(position=(0,0,0), size=(.99, 0.01, .99), orientation=90):
+    coef = 670
+    schema_pos = (.1176 + position[0]/coef, position[2]/-coef -.0475, -.18)
+    schema_size = (size[0]/coef, size[2]/coef, .0001)
+    glPushMatrix()
+    glRotatef((orientation-90)*-1, 0, 1, 0)
+    plane(schema_pos, schema_size, orientation) 
+    glPopMatrix()
+
+def plane(position=(0,0,0), size=(.99, 0.01, .99), orientation=90, lines=False):
     x= position[0]
     y= position[1]
     z= position[2]
@@ -49,7 +58,7 @@ def plane(position=(0,0,0), size=(.99, 0.01, .99), lines=False):
         (x+size[0], y+size[1], z-size[2]),  # 6
         (x+size[0], y, z-size[2])           # 7  
     )
-    
+
     if lines:
         glBegin(GL_LINES)
         for edge in edges:

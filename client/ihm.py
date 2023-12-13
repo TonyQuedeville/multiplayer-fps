@@ -170,7 +170,6 @@ def initIHM(serveur_port, serveur_ip, client_socket, pseudo):
         fps_counter += 1
         if time.time() - fps_timer > 1:  # Vérifier toutes les secondes
             fps = round(fps_counter / (time.time() - fps_timer))
-            # print(f"FPS: {fps}")
             fps_counter = 0
             fps_timer = time.time()
         

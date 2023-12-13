@@ -16,7 +16,7 @@ from ihm import get_ihm_game
 # -----------------------------------------------------------------------------------------------
 # globals:
 # Adresse IP et port du serveur
-serveur_ip = "192.168.1.46" #"192.168.100.151" #"172.16.0.230" # #"127.0.0.1"
+serveur_ip = "192.168.100.151" #"172.16.0.230" # #"127.0.0.1"
 serveur_port = 12345
 
 # Création d'une socket UDP
@@ -49,7 +49,7 @@ def send_sever(data):
 
 def new_player():
     global serveur_ip
-    # serveur_ip = input("Entrez l'adresse ip du server (ou 'exit' pour quitter) : ")
+    serveur_ip = input("Entrez l'adresse ip du server (ou 'exit' pour quitter) : ")
     pseudo = input("Entrez votre pseudo (ou 'exit' pour quitter) : ")
     
     if serveur_ip == "exit" or pseudo == "exit":

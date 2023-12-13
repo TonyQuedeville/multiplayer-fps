@@ -9,19 +9,16 @@
 # -----------------------------------------------------------------------------------------------
 #  imports:
 import random
-import pygame
 from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
-# from OpenGL.GLUT import *
-
 
 # -----------------------------------------------------------------------------------------------
 # globals:
 
 # -----------------------------------------------------------------------------------------------
 
-def sphere(id, coord=(0, 0, 0), orientation=90, macoord=(0,0,0), radius=0.25, tremblote=0, slices=30, stacks=30, lines=False):       
+def sphere(coord=(0, 0, 0), orientation=90, macoord=(0,0,0), radius=0.25, tremblote=0, slices=30, stacks=30, lines=False):       
     sphere_surface = gluNewQuadric()
     gluQuadricTexture(sphere_surface, GL_TRUE)
 
@@ -38,5 +35,7 @@ def sphere(id, coord=(0, 0, 0), orientation=90, macoord=(0,0,0), radius=0.25, tr
     gluSphere(sphere_surface, radius, slices, stacks)
 
     glPopMatrix()
+    
+
 
 

@@ -18,11 +18,11 @@ from OpenGL.GL import *
 from forms3D.camera import Camera
 from forms3D.textures import Texture
 
-from forms3D.plane import couloir, porte
+from forms3D.plane import couloir, porte, minimap
 from forms3D.cube import cube
 from forms3D.groom import groom
 from forms3D.sphere import sphere
-from forms3D.cylindre import cylindre
+from forms3D.cylindre import cylindre, disque
 from forms3D.tetra import tetra
 from forms3D.texte import texte3D
 
@@ -105,7 +105,7 @@ class Scene():
         
         self.chiffre_rotate = 0 # Orientation des numero d'entrée au sol du hall d'accueil
     
-    def animations_scene(self, timer=2):
+    def animations_scene(self, timer=0):
         if timer == 0:
             self.random_theme()
         else:
@@ -279,7 +279,7 @@ class Scene():
                         nb = int(value.split('-')[-1])
                         
                         if prefixe_form == "sl" or prefixe_form == "sp" or prefixe_form == "ml" or prefixe_form == "cl":
-                            self.texture.apply_sols(nb)                            
+                            self.texture.apply_sols(nb) 
                         elif prefixe_form == "bl":
                             self.texture.apply_theme(nb)
                         elif prefixe_form == "ch":
@@ -290,6 +290,9 @@ class Scene():
                             self.chiffre_rotate = chiffre_orientation.get(nb)
                 
                 self.forms(prefixe_form, (x-self.player_x, -0.5, y-self.player_z))
+                if prefixe_form == "sl" or prefixe_form == "ch": 
+                    # self.texture.apply_sols(0)
+                    self.forms("mm", (x, -0.5, y))
                 value_change = value 
         
         # Médaillons
@@ -304,16 +307,19 @@ class Scene():
             for player in game.players:
                 if player.id != game.id and player.player_nb_room == self.nb_room:
                     self.texture.apply_eyes(player.id)
-                    sphere(player.id, player.player_coord, player.player_orientation, (self.player_x, -0.5, self.player_z), self.radius_eyes, 2), # Oeil de player
+                    sphere(player.player_coord, player.player_orientation, (self.player_x, -0.5, self.player_z), self.radius_eyes, 2), # Oeil de player
+
         
         # Score Board
         self.texture.apply_sols(1)
         texte3D("Jeton : " + str(self.player_nb_medaillon) + " ", (-.075, .05, -.1), self.player_orientation) # nombre de medaillon
         texte3D(" fps : " + str(fps), (.06, .05, -.1), self.player_orientation) # fps
+        disque((self.player_x, self.player_z, -.12), self.player_orientation), # Ma position dans le schema
 
     def forms(self, prefixe_form, coord):
         switcher = {
-            "sl": lambda: couloir(coord), # Sol + plafond
+            "sl": lambda: couloir(coord, (.99, 0.01, .99)), # Sol + plafond
+            "mm": lambda: minimap(coord, (.99, 0.01, .99), self.player_orientation), # une case de minimap
             "ml": lambda: cube(coord), # Block mur
             "bl": lambda: cube(coord), # Block image
             "ch": lambda: porte(coord, (.98, .01, .98), self.chiffre_rotate), # Chiffre au sol + plafond

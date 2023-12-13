@@ -61,3 +61,35 @@ def cylindre(position=(0, 0, 0), macoord=(0,0,0), radius=1, height=1, rotate_ang
         glTexCoord2f(0.5 * math.cos(i * step) + 0.5, 0.5 * math.sin(i * step) + 0.5)
         glVertex3f(vertices[i][0], rotated_y + height, vertices[i][2])  # Point sur le cercle de la base supérieure
     glEnd()
+
+
+def disque(position=(0, 0, -.1), orientation=90, radius=.0004, sides=30):
+    x = position[0] / 1000 + .0783
+    y = position[1] / -1000 -.0316
+    z = position[2]
+    vertices = []
+    step = 2 * math.pi / sides
+
+    # Générer les points pour les côtés du disque
+    for i in range(sides + 1):
+        angle = i * step 
+        
+        rotated_x = x + radius * math.cos(angle) 
+        rotated_y = y + radius * math.sin(angle)
+        rotated_z = z 
+        vertices.append((rotated_x, rotated_y, rotated_z))
+    
+    # Disque
+    glPushMatrix()
+    glRotatef((orientation-90)*-1, 0, 1, 0)
+    
+    glBegin(GL_TRIANGLE_FAN)
+    glTexCoord2f(0.5, 0.5)
+    glVertex3f(x, y, z)  # Centre du cercle de la base inférieure
+    
+    for vertex in vertices:
+        glTexCoord2f(0.5 + 0.5 * vertex[0] / radius, 0.5 + 0.5 * vertex[2] / radius)
+        glVertex3f(vertex[0], vertex[1], vertex[2])  # Sommets du cercle
+    glEnd()
+    
+    glPopMatrix()
