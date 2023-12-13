@@ -23,7 +23,6 @@ from forms3D.cube import cube
 from forms3D.groom import groom
 from forms3D.sphere import sphere
 from forms3D.cylindre import cylindre, disque
-from forms3D.tetra import tetra
 from forms3D.texte import texte3D
 
 from forms3D.levels.level0 import *
